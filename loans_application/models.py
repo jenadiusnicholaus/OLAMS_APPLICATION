@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import random
 
+
 class  TBL_App_NECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     NECTA_STUDENT_ED_LEVEL_STATUS = (('FORM_4', 'FORM FOUR'),('FORM_6', 'FORM SIX'),)
@@ -156,9 +157,20 @@ class TBL_App_PaymentDetails(models.Model):
         if self.used_by is None:
             return None
         return 'TBL App Aayment Details'
-        
-     
-     
+
+class TBL_App_ApplicantAttendedSchool(models.Model):
+    necta_applicants = models.ManyToManyField(TBL_App_NECTADetails)
+    center_number = models.CharField(max_length=10, null= True,  blank=True, unique=True)
+    center_name = models.CharField(max_length=10, null= True,  blank=True)
+    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'TBL App Applicant Attended Schools'
+
+    def __str__(self):
+        return self.center_number
      
 
 

@@ -14,5 +14,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('applicant-category/', ApplicantCategoryViewSet.as_view()),
     path('search-applicant/', SearchNetaApplicantViewSet.as_view()),
+     path('add-applicant-attented-school/', AddSchoolView.as_view()),
+ 
 
 ]

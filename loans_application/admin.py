@@ -8,5 +8,6 @@ admin.site.register(TBL_App_Applicantion)
 admin.site.register(TBL_App_Categories)
 admin.site.register(TBL_App_PaymentDetails)
 admin.site.register(TBL_App_InitialApplicantCategory)
+admin.site.register(TBL_App_ApplicantAttendedSchool)
 
 

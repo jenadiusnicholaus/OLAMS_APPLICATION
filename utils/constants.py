@@ -1,3 +1,6 @@
+from datetime import date
+
+
 class Constants:
     form_four_axam_id = 1
     form_six_exam_id = 2
@@ -5,4 +8,5 @@ class Constants:
     url = "https://api.necta.go.tz/api/particulars/individual"
     none_necta = 'none_necta'
     necta = 'necta'
+    current_year = date.today().year
 
