@@ -3,19 +3,15 @@ from django.db import IntegrityError
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
-from . models import *
-from . serializers import *
+from .models import *
+from .serializers import *
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework import generics, decorators, permissions, status
-from . external_api import CallExternalApi
+from .external_api import CallExternalApi
 from utils.constants import Constants
 from utils.serialize_models import SerializerManager
 from django.shortcuts import get_object_or_404
-
-
-
-
 
 class ApplicantCategoryViewSet(APIView):
     authentication_classes = []
@@ -47,11 +43,11 @@ class SearchNetaApplicantViewSet(APIView):
             exam_year = request.data['exam_year']
             app_year = Constants.current_year
             applicant_category =request.data['applicant_cateory']
-            applicant = None
+            _necta_applicant = None
             if applicant_category == Constants.necta:
-                applicant = TBL_App_NECTADetails.objects.filter(Q(index_no__exact=index_no) & Q(app_year__exact=app_year))
-                if applicant.exists():
-                    searchedApplicantSerializer= NectaApplicationSerializer(instance= applicant,many=True)
+                _necta_applicant = TBL_App_NECTADetails.objects.filter(Q(index_no__exact=index_no) & Q(app_year__exact=app_year))
+                if _necta_applicant.exists():
+                    searchedApplicantSerializer= NectaApplicationSerializer(instance= _necta_applicant,many=True)
              
                     response_obj = {
                         'status_code': status.HTTP_200_OK,
@@ -93,7 +89,7 @@ class SearchNetaApplicantViewSet(APIView):
                         exam_year = exam_year
                         # in the front-end allow the user to confirm the his/her information
                         try:
-                            applicant, created = TBL_App_NECTADetails.objects.get_or_create(
+                            necta_applicant, created = TBL_App_NECTADetails.objects.get_or_create(
                             index_no = new_index_no,
                             education_level =  education_level ,
                             first_name = first_name,
@@ -105,10 +101,14 @@ class SearchNetaApplicantViewSet(APIView):
                             exam_year = exam_year,
                             )
                             # update the category applicant instance
-                            TBL_App_InitialApplicantCategory.objects.get_or_create(
-                                 necta = applicant
+                            _necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
+                                 necta = necta_applicant
                             )
-                        
+                            # update the applicant details page
+                            _necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
+                                applicant_categories=_necta_applicant_initial_category
+                            )
+
                         except IntegrityError as e: 
                             response_obj = {
                             'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -150,15 +150,6 @@ class SearchNetaApplicantViewSet(APIView):
 class AddSchoolView(APIView):
     authentication_classes = []
     permission_classes = []
-    def get(self, request, format=None):
-        response_obj={
-                    "success": True,
-                    'status_code': status.HTTP_200_OK,
-                    "message": "No data specied in the body",
-                    "data": {}
-                    }
-        return Response(response_obj)
-        
     def post(self, request, format=None):
         if request.data:
             _center_name = request.data['center_name']
@@ -166,11 +157,8 @@ class AddSchoolView(APIView):
             _index_no= request.data['index_no']
             _applcant_application_year = request.data['app_year']
             _exam_year = request.data['exam_year']
-    
-
             applicant_school = TBL_App_ApplicantAttendedSchool.objects.filter(center_number=_center_number)
-        
-            applicant = get_object_or_404(TBL_App_NECTADetails,index_no=_index_no)
+            applicant =TBL_App_NECTADetails.objects.get(index_no = _index_no, app_year=_applcant_application_year)
         
             if applicant_school.exists:
                
@@ -217,8 +205,141 @@ class AddSchoolView(APIView):
             }
             return Response(response_obj)
 
+class ApplicantExistenceView(APIView): 
+    """On applicnt confirms his details then check his existance"""
 
+    authentication_classes = []
+    permission_classes = []
 
+    def post(self, request, format=None):
+        if request.data:
+            _index_no = request.data['index_no']
+            _app_year =request.data['app_year']
+            _applicant_category = request.data['applicant_type']
 
-   
+            if _applicant_category == Constants.necta:
+                necta_applicant =get_object_or_404( TBL_App_NECTADetails, index_no = _index_no)
+
+                _necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
+                                 necta = necta_applicant
+                            )
+                          
+                _necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
+                                applicant_categories=_necta_applicant_initial_category
+                            )
+                
+                applicant = TBL_App_Applicant.objects.filter(
+                     applicant_details =  _necta_applicant_details
+                    )
+                if applicant.exists():
+
+                    response_obj={
+                        "success": True,
+                        'status_code': status.HTTP_200_OK,
+                        "message":'exits',
+                        "data": request.data
+                        }
+                    return Response(response_obj)
+                else:
+                    # updete the applicanrt model
+                    response_obj={
+                        "success": True,
+                        'status_code': status.HTTP_200_OK,
+                        "message":'updete_application_details',
+                        "data": request.data
+                        }
+                    return Response(response_obj)
+
+            else:
+                # process the none nacta
+                response_obj={
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "press none necata",
+                
+                }
+                return Response(response_obj)
+        response_obj={
+            "success": True,
+            'status_code': status.HTTP_200_OK,
+            "message": "No prameter or data specified in the request body",
+            
+            }
+        return Response(response_obj)
+
+class ApplicantDetailsView(APIView):
+    authentication_classes = []
+    permission_classes = []
+    def post(self, request, format=None):
+        pass
     
+
+    def post(self, request, format=None):
+        if request.data:
+            _index_no = request.data[ "index_no"]
+            _app_year = request.data["app_year"]
+            _applicant_type = request.data["applicant_type"]
+            _applicant_category =request.data["applicant_category"]
+            _phone_number = request.data["phone_number"]
+            _email = request.data["email"]
+            if  _applicant_type == Constants.necta:
+                try:
+                # check for applicant by index number and application year
+                    necta_applicant =TBL_App_NECTADetails.objects.get( index_no = _index_no, app_year=_app_year)
+                except necta_applicant.DoesNotExist:
+                    raise
+        
+                # get or create the the applicant type if not exiting
+                _necta_applicant_type, created = TBL_App_ApplicantType.objects.get_or_create(
+                                        necta__index_no = necta_applicant.index_no
+                                    )
+                                
+                # update the applicant details
+                _necta_applicant_details = TBL_App_ApplicantDetails.objects.get(
+                                        applicant_type__necta__index_no = _necta_applicant_type.necta.index_no,
+                                    )
+                _necta_applicant_details.phonenumber = _phone_number
+                _necta_applicant_details.email = _email
+                _necta_applicant_details.save()
+
+
+                # create applicant categories
+                application_category, create = TBL_App_Categories.objects.get_or_create(
+                                name = _applicant_category
+                        )
+                # get or create the applicnt table if not  exits
+                applicant, created = TBL_App_Applicant.objects.get_or_create(
+                            applicant_details =  _necta_applicant_details,
+                            application_category =application_category,
+                        
+                            )
+                applicant_infos = TBL_App_Applicant.objects.filter(
+                            applicant_details =  _necta_applicant_details,
+                            application_category =application_category,
+                        
+                            )
+                applicantSerializer=ApplicantSerializer(instance=  applicant_infos, many=True)
+
+                response_obj = {
+                    "success": True,
+                    'status_code': status.HTTP_200_OK,
+                    "message": 'created or updated successifully',
+                    "data": applicantSerializer.data
+                    }
+                return Response(response_obj)
+            else:
+                response_obj={
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": " process the none necta applicant",
+                
+                }
+                return Response(response_obj)
+        else:
+            response_obj = {
+            "success": True,
+            'status_code': status.HTTP_200_OK,
+            "message": "No prameter or data specified in the request body",
+            
+            }
+            return Response(response_obj)

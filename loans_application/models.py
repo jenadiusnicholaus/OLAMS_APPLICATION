@@ -8,7 +8,7 @@ import random
 class  TBL_App_NECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     NECTA_STUDENT_ED_LEVEL_STATUS = (('FORM_4', 'FORM FOUR'),('FORM_6', 'FORM SIX'),)
-    index_no = models.CharField(max_length = 16, unique = True)
+    index_no = models.CharField(max_length = 16, unique = True, null=True, blank=True)
     education_level = models.CharField(max_length = 16,choices = NECTA_STUDENT_ED_LEVEL_STATUS, null = True)
     first_name = models.CharField(max_length = 16, null= False, blank=True)
     middle_name = models.CharField(max_length = 16, null= False, blank=True)
@@ -29,7 +29,7 @@ class  TBL_App_NECTADetails(models.Model):
 
 class  TBL_App_NoneNECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
-    index_no =  models.CharField(max_length= 16, unique=True)
+    index_no =  models.CharField(max_length= 16, unique=True, null=True, blank=True)
     original_no = models.CharField(max_length= 30)
     first_name = models.CharField(max_length= 16)
     middle_name = models.CharField(max_length= 16)
@@ -61,7 +61,7 @@ class  TBL_App_NoneNECTADetails(models.Model):
             self.index_no = new_index_no
             return super(TBL_App_NoneNECTADetails, self,).save(*args, **kwargs)
 
-class TBL_App_InitialApplicantCategory(models.Model):
+class TBL_App_ApplicantType(models.Model):
     """
      Initially the applicant category can be necta on none necta
     """
@@ -73,7 +73,7 @@ class TBL_App_InitialApplicantCategory(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App InitialApplicantCategory'
+        verbose_name_plural = 'TBL App ApplicantType'
 
 
     def __str__(self):
@@ -82,11 +82,9 @@ class TBL_App_InitialApplicantCategory(models.Model):
         return self.none_necta.first_name
         
 class TBL_App_ApplicantDetails(models.Model):
-    applicant_categories = models.ForeignKey(TBL_App_InitialApplicantCategory, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tbl_app_initial_applicant_category')
-    f4_indexno = models.CharField(max_length= 30, null=True, blank= False)
-    sur_name = models.CharField(max_length=20, null=False, blank=False )
-    middle_name = models.CharField(max_length=20, null=False, blank=False )
+    applicant_type = models.ForeignKey(TBL_App_ApplicantType, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tbl_app_initial_applicant_type')
     phonenumber = models.CharField(max_length= 15, null= False, blank=False)
+    email = models.EmailField(max_length= 30,null = True, blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
  
@@ -95,15 +93,12 @@ class TBL_App_ApplicantDetails(models.Model):
         verbose_name_plural = 'TBL App Applicant Details'
         
     def __str__(self):
-        if  self.applicant_categories is not None and   self.applicant_categories.necta !=  None:
+        if  self.applicant_type is not None and   self.applicant_type.necta !=  None:
            
-            return self.applicant_categories.necta.first_name
-        return self.applicant_categories.none_necta.first_name
-    def save(self, *args, **kwargs):
-        # if( self.applicant_categories is not None):
-
-        return super().save(*args, **kwargs)
- 
+            return self.applicant_type.necta.first_name
+        else:
+            return self.applicant_type.none_necta.first_name
+    
         
 class TBL_App_Categories(models.Model):
     name = models.CharField(max_length=20, null = True,blank=True)
@@ -118,7 +113,7 @@ class TBL_App_Categories(models.Model):
         return self.name
 
 
-class TBL_App_Applicantion(models.Model):
+class TBL_App_Applicant(models.Model):
     applicant_details = models.ForeignKey(TBL_App_ApplicantDetails,  on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_details')
     application_category = models.ForeignKey(TBL_App_Categories, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_category' )
     created_at = models.DateTimeField(default=timezone.now)
@@ -129,15 +124,15 @@ class TBL_App_Applicantion(models.Model):
         verbose_name_plural = 'TBL App Applicants'
 
     def __str__(self):
-        if self.applicant_details is not None and self.applicant_details.applicant_categories.none_necta is None:
-            return self.applicant_details.applicant_categories.necta.first_name
-        return self.applicant_details.applicant_categories.none_necta.firt_name
+        if self.applicant_details is not None and self.applicant_details.applicant_type.none_necta is None:
+            return self.applicant_details.applicant_type.necta.first_name
+        return self.applicant_details.applicant_type.none_necta.firt_name
 
 
 class TBL_App_PaymentDetails(models.Model):
     PAYMENY_STATUS = (('no_paid', 'Not Paid'), ('paid', 'Paid'))
-    USED_STATUS =  (('not_used', 'No used'), ('useed', 'used'))
-    applicant = models.ForeignKey(TBL_App_Applicantion, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant', null=True)
+    USED_STATUS =  (('not_used', 'No used'), ('used', 'used'))
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant', null=True)
     payment_status =  models.CharField(max_length=20 ,choices=PAYMENY_STATUS, default=0)
     control_number = models.CharField(max_length=30, null=False, blank=False )
     reference =  models.CharField(max_length=30, null=False, blank=False )
@@ -174,7 +169,7 @@ class TBL_App_ApplicantAttendedSchool(models.Model):
      
 
 
-    
+
 
 
 
