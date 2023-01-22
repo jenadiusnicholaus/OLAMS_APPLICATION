@@ -3,8 +3,10 @@ from django.db import IntegrityError
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
-from .models import *
-from .serializers import *
+
+from loans_application.none_serializers import NoneNectaApplicantSerializer
+from .models import * 
+from .necta_serializers import *
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework import generics, decorators, permissions, status
@@ -18,12 +20,12 @@ class ApplicantCategoryViewSet(APIView):
     permission_classes = []
     def post(self, request, format=None):
         if request.data:
-            applicant_categories = request.data['applicant_category']
+            applicant_type = request.data['applicant_category']
             response_obj = {
                     'status_code': status.HTTP_200_OK,
                     'success': True,
                     'data': {
-                    'applicant_cateory': applicant_categories,
+                    'applicant_cateory': applicant_type
                     }
                 }
             return Response(response_obj)
@@ -41,17 +43,17 @@ class SearchNetaApplicantViewSet(APIView):
         if request.data:
             index_no = request.data['index_no']
             exam_year = request.data['exam_year']
-            app_year = Constants.current_year
-            applicant_category =request.data['applicant_cateory']
+            app_year = request.data['app_year']
+            applicant_type =request.data['applicant_type']
             _necta_applicant = None
-            if applicant_category == Constants.necta:
+            if applicant_type == Constants.necta:
                 _necta_applicant = TBL_App_NECTADetails.objects.filter(Q(index_no__exact=index_no) & Q(app_year__exact=app_year))
                 if _necta_applicant.exists():
-                    searchedApplicantSerializer= NectaApplicationSerializer(instance= _necta_applicant,many=True)
+                    searchedApplicantSerializer = NectaApplicantSerializer(instance = _necta_applicant,many=True)
              
                     response_obj = {
                         'status_code': status.HTTP_200_OK,
-                        "message": "Applicant exists, Continue with the application",
+                        "message": "Applicant exists, in pre-application  necta table check for an existence in-progress application table",
                         'success': True,
                         'data': searchedApplicantSerializer.data[0]
                     }
@@ -74,7 +76,7 @@ class SearchNetaApplicantViewSet(APIView):
                         middle_name = individual_data['particulars']['middle_name']
                        
                         education_level = ''
-                        sex =''
+                        sex = ''
                         if  individual_data['particulars']['exam_id'] == 1:
                             education_level  = 'FORM_4'
                         else:
@@ -85,7 +87,7 @@ class SearchNetaApplicantViewSet(APIView):
                             sex = 'MALE'
 
                         sur_name = ''
-                        app_year = Constants.current_year
+                        app_year = app_year
                         exam_year = exam_year
                         # in the front-end allow the user to confirm the his/her information
                         try:
@@ -101,12 +103,12 @@ class SearchNetaApplicantViewSet(APIView):
                             exam_year = exam_year,
                             )
                             # update the category applicant instance
-                            _necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
+                            _necta_applicant_type, created = TBL_App_ApplicantType.objects.get_or_create(
                                  necta = necta_applicant
                             )
                             # update the applicant details page
                             _necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
-                                applicant_categories=_necta_applicant_initial_category
+                                applicant_type=_necta_applicant_type
                             )
 
                         except IntegrityError as e: 
@@ -120,7 +122,7 @@ class SearchNetaApplicantViewSet(APIView):
                             'status_code': status.HTTP_200_OK,
                             "message": "applicant, saved successfull",
                             "data": {
-                                    'applicant_category': applicant_category,
+                                    'applicant_type': applicant_type,
                                     'nacta_data':individual_data['particulars']
                             } }
                         return Response(response_obj) 
@@ -135,17 +137,32 @@ class SearchNetaApplicantViewSet(APIView):
             
             else:
                 #  the logic for the none necta user
-                response_obj={
-                        "success": True,
+                #  in  the early stages we use the original_no to search applicant exitance in the  none necta 
+                #  but later after an application has completed, we provide the index_no for further reference 
+                _none_necta_applicant, none_necta_created = TBL_App_NoneNECTADetails.objects.get_or_create(original_no=index_no, app_year=app_year)
+                _searched_none_applicant_serializer = NoneNectaApplicantSerializer(instance= _none_necta_applicant)
+                _none_necta_details = ApplicantDetailsSerializer(instance=_none_necta_details,)
+                if none_necta_created:
+                    response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": "Created successifully",
+                            'data':_searched_none_applicant_serializer.data}
+                    return Response(response_obj)
+                else:
+                    response_obj = {
                         'status_code': status.HTTP_200_OK,
-                        "message": "Process the none necta "}
-                return Response(response_obj)
-
-        response_obj={
+                        "message": "Applicant exists, in pre-application  none table check for an existence in-progress application table",
+                        'success': True,
+                        'data': _none_necta_details.data
+                    }
+                    return Response(response_obj)
+        else:
+            response_obj={
                         "success": True,
                         'status_code': status.HTTP_200_OK,
                         "message": "No data specied in the body"}
-        return Response(response_obj)
+            return Response(response_obj)
 
 class AddSchoolView(APIView):
     authentication_classes = []
@@ -160,14 +177,14 @@ class AddSchoolView(APIView):
             applicant_school = TBL_App_ApplicantAttendedSchool.objects.filter(center_number=_center_number)
             applicant =TBL_App_NECTADetails.objects.get(index_no = _index_no, app_year=_applcant_application_year)
         
-            if applicant_school.exists:
+            if applicant_school.exists():
                
-                if applicant_school[0].necta_applicants.filter(
+                if applicant_school.first().necta_applicants.filter(
                     index_no= _index_no,
                     app_year =_applcant_application_year).exists():
                     pass
                 else:
-                    applicant_school[0].necta_applicants.add(applicant)
+                    applicant_school.first().necta_applicants.add(applicant)
                     response_obj={
                     "success": True,
                     'status_code': status.HTTP_200_OK,
@@ -206,7 +223,7 @@ class AddSchoolView(APIView):
             return Response(response_obj)
 
 class ApplicantExistenceView(APIView): 
-    """On applicnt confirms his details then check his existance"""
+    """On applicnt confirms his/her details then check his existance"""
 
     authentication_classes = []
     permission_classes = []
@@ -218,20 +235,20 @@ class ApplicantExistenceView(APIView):
             _applicant_category = request.data['applicant_type']
 
             if _applicant_category == Constants.necta:
-                necta_applicant =get_object_or_404( TBL_App_NECTADetails, index_no = _index_no)
+                _necta_applicant =get_object_or_404( TBL_App_NECTADetails, index_no = _index_no)
 
                 _necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
-                                 necta = necta_applicant
+                                 necta = _necta_applicant
                             )
                           
                 _necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
-                                applicant_categories=_necta_applicant_initial_category
+                                applicant_type=_necta_applicant_initial_category
                             )
                 
-                applicant = TBL_App_Applicant.objects.filter(
+                _necta_applicant = TBL_App_Applicant.objects.filter(
                      applicant_details =  _necta_applicant_details
                     )
-                if applicant.exists():
+                if _necta_applicant.exists():
 
                     response_obj={
                         "success": True,
@@ -252,13 +269,39 @@ class ApplicantExistenceView(APIView):
 
             else:
                 # process the none nacta
-                response_obj={
-                "success": True,
-                'status_code': status.HTTP_200_OK,
-                "message": "press none necata",
+                _none_necta_applicant =get_object_or_404( TBL_App_NoneNECTADetails,original_no = _index_no)
+
+                _none_necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
+                                 necta = _none_necta_applicant
+                            )
+
+                _none_necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
+                                applicant_type=_none_necta_applicant_initial_category
+                            )
+                _none_necta_applicant = TBL_App_Applicant.objects.filter(
+                     applicant_details =  _none_necta_applicant_details
+                    )
+
+                if _none_necta_applicant.exists():
+
+                    response_obj={
+                        "success": True,
+                        'status_code': status.HTTP_200_OK,
+                        "message":'exits',
+                        "data": request.data
+                        }
+                    return Response(response_obj)
+                else:
+                    # updete the applicanrt model
+                    response_obj={
+                        "success": True,
+                        'status_code': status.HTTP_200_OK,
+                        "message":'updete_application_details',
+                        "data": request.data
+                        }
+                    return Response(response_obj)
+
                 
-                }
-                return Response(response_obj)
         response_obj={
             "success": True,
             'status_code': status.HTTP_200_OK,
@@ -286,8 +329,14 @@ class ApplicantDetailsView(APIView):
                 try:
                 # check for applicant by index number and application year
                     necta_applicant =TBL_App_NECTADetails.objects.get( index_no = _index_no, app_year=_app_year)
-                except necta_applicant.DoesNotExist:
-                    raise
+                except:
+                    response_obj = {
+                    "success": False,
+                    'status_code': status.HTTP_404_NOT_FOUND,
+                    "message": "No found",
+                    
+                    }
+                    return Response(response_obj)
         
                 # get or create the the applicant type if not exiting
                 _necta_applicant_type, created = TBL_App_ApplicantType.objects.get_or_create(
@@ -328,11 +377,11 @@ class ApplicantDetailsView(APIView):
                     }
                 return Response(response_obj)
             else:
+                
                 response_obj={
                 "success": True,
                 'status_code': status.HTTP_200_OK,
                 "message": " process the none necta applicant",
-                
                 }
                 return Response(response_obj)
         else:

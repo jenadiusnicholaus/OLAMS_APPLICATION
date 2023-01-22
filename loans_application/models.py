@@ -1,14 +1,18 @@
 
+import datetime
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import random
+from utils.constants import Constants
 
 
 class  TBL_App_NECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     NECTA_STUDENT_ED_LEVEL_STATUS = (('FORM_4', 'FORM FOUR'),('FORM_6', 'FORM SIX'),)
-    index_no = models.CharField(max_length = 16, unique = True, null=True, blank=True)
+    index_no = models.CharField(max_length = 16, unique = False, null=True, blank=True)
     education_level = models.CharField(max_length = 16,choices = NECTA_STUDENT_ED_LEVEL_STATUS, null = True)
     first_name = models.CharField(max_length = 16, null= False, blank=True)
     middle_name = models.CharField(max_length = 16, null= False, blank=True)
@@ -29,7 +33,7 @@ class  TBL_App_NECTADetails(models.Model):
 
 class  TBL_App_NoneNECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
-    index_no =  models.CharField(max_length= 16, unique=True, null=True, blank=True)
+    index_no =  models.CharField(max_length= 16, unique=True, null=True, blank=True, editable=False)
     original_no = models.CharField(max_length= 30)
     first_name = models.CharField(max_length= 16)
     middle_name = models.CharField(max_length= 16)
@@ -41,25 +45,47 @@ class  TBL_App_NoneNECTADetails(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     changed_necta = models.BooleanField(default=False)
+   
 
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = 'TBL App Applicants None NECTA User Details'
 
     def __str__(self):
-        return self.index_no
+        return str(self.index_no)
 
-    def __random_number(self):
-        number = random.randint(1000,9999)
-        return number
+    @property
+    def _id(self):
+        return self.id
+
+    def index_no_id(self, id):
+        number = f"{random.randint(1,1000)}".zfill(4)
+        return str(number)
+      
+
+    def two_last_digts_of_app_year(self):
+        if self.app_year is None:
+            return str(Constants.current_year)[-2:]
+        return str(self.app_year)[-2:]
+
+    def get_exam_year(self):
+        if self.exam_year  is not None:
+            return str(self.exam_year)
+        self.exam_year = str(self.original_no)[-4:]
+        return str(self.original_no)[-4:]
         
+    def generate_index_number(self):
+        _new_index_no =  f'E00{self.two_last_digts_of_app_year()}.{self.index_no_id(self.id)}.{self.get_exam_year()}'
+        return _new_index_no
+
+    def assign_the_index_no(self):
+        self.index_no = self.generate_index_number()
+
     def save(self, *args, **kwargs):
         if self.original_no is not None and self.index_no is None:
-            two_digits_of_app_year = self.app_year % 100 
-            # Todo: update on on the  dave by create ting applicnt index no
-            new_index_no =  f'E00{two_digits_of_app_year}.{self.__random_number}.'
-            self.index_no = new_index_no
+            self.assign_the_index_no()
             return super(TBL_App_NoneNECTADetails, self,).save(*args, **kwargs)
+
 
 class TBL_App_ApplicantType(models.Model):
     """
@@ -80,6 +106,18 @@ class TBL_App_ApplicantType(models.Model):
         if self.none_necta == None:
             return self.necta.first_name
         return self.none_necta.first_name
+
+
+@receiver(post_save, sender=TBL_App_NoneNECTADetails)
+def create_or_update_applicant_type(sender, instance, created, **kwargs):
+    if created:
+        try:
+            TBL_App_ApplicantType.objects.update_or_create(
+                none_necta = instance)
+        except Exception as ex:
+            raise
+
+
         
 class TBL_App_ApplicantDetails(models.Model):
     applicant_type = models.ForeignKey(TBL_App_ApplicantType, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tbl_app_initial_applicant_type')
@@ -92,12 +130,22 @@ class TBL_App_ApplicantDetails(models.Model):
         ordering = ['-created_at']
         verbose_name_plural = 'TBL App Applicant Details'
         
-    def __str__(self):
-        if  self.applicant_type is not None and   self.applicant_type.necta !=  None:
+    # def __str__(self):
+    #     if  self.applicant_type is not None and   self.applicant_type.necta !=  None:
            
-            return self.applicant_type.necta.first_name
-        else:
-            return self.applicant_type.none_necta.first_name
+    #         return self.applicant_type.necta.first_name
+    #     else:
+    #         return self.applicant_type.none_necta.first_name
+
+@receiver(post_save, sender=TBL_App_ApplicantType)
+def create_or_update_applicant_details(sender, instance, created, **kwargs):
+    # for each subject, add class in the table of subjectClass
+    if created:
+        try:
+            TBL_App_ApplicantDetails.objects.update_or_create(
+                applicant_type = instance)
+        except Exception as ex:
+            raise
     
         
 class TBL_App_Categories(models.Model):

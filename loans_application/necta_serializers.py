@@ -1,24 +1,20 @@
 
 from rest_framework import  serializers
-from . models import *
 
-class NectaApplicationSerializer(serializers.ModelSerializer):
+from loans_application.none_serializers import NoneNectaApplicantSerializer
+from .models import *
+
+class NectaApplicantSerializer(serializers.ModelSerializer):
     class Meta:
         model = TBL_App_NECTADetails
         fields = '__all__'
 
-class NoneNectaApplicantSerialize(serializers.ModelSerializer):
-    class Meta:
-        model = TBL_App_NoneNECTADetails
-        fields = '__all__'
-
 class ApplicantTypeSerialize(serializers.ModelSerializer): 
-    necta = NectaApplicationSerializer()
-    none_necta = NoneNectaApplicantSerialize()
+    necta = NectaApplicantSerializer()
+    none_necta = NoneNectaApplicantSerializer()
     class Meta:
         model =TBL_App_ApplicantType
         fields = '__all__'
-
 
 
 class SearchedNectaApplicationSerializer(serializers.ModelSerializer):
