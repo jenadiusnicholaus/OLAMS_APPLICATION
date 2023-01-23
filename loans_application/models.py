@@ -105,7 +105,7 @@ class TBL_App_ApplicantType(models.Model):
     def __str__(self):
         if self.none_necta == None:
             return self.necta.first_name
-        return self.none_necta.first_name
+        return str(self.none_necta.original_no)
 
 
 @receiver(post_save, sender=TBL_App_NoneNECTADetails)
@@ -130,12 +130,16 @@ class TBL_App_ApplicantDetails(models.Model):
         ordering = ['-created_at']
         verbose_name_plural = 'TBL App Applicant Details'
         
-    # def __str__(self):
-    #     if  self.applicant_type is not None and   self.applicant_type.necta !=  None:
+    def __str__(self):
+        if  self.applicant_type:  
+            if self.applicant_type.necta !=  None:
            
-    #         return self.applicant_type.necta.first_name
-    #     else:
-    #         return self.applicant_type.none_necta.first_name
+                return self.applicant_type.necta.first_name
+            else:
+                if self.applicant_type.none_necta.first_name:
+                    return self.applicant_type.none_necta.first_name
+                return self.applicant_type.none_necta.original_no
+               
 
 @receiver(post_save, sender=TBL_App_ApplicantType)
 def create_or_update_applicant_details(sender, instance, created, **kwargs):

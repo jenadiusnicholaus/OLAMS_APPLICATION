@@ -13,6 +13,8 @@ urlpatterns = [
     path('search-applicant/', SearchNetaApplicantViewSet.as_view()),
     path('add-applicant-attented-school/', AddSchoolView.as_view()),
     path('applicant-existance/', ApplicantExistenceView.as_view()),
-    path('pre-necta-applicant-contact-infos/', ApplicantDetailsView.as_view()),
+    path('pre-applicant-necta-contact-infos/', PreAplicantNectAContactInfosView.as_view()),
+    path('pre-applicant-none-necta-contact-infos/', PreAplicantNoneNectAContactInfosView.as_view()),
+
 
 ]
