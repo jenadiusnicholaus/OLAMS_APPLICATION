@@ -15,12 +15,12 @@ from utils.constants import Constants
 from utils.serialize_models import SerializerManager
 from django.shortcuts import get_object_or_404
 
-class ApplicantCategoryViewSet(APIView):
+class ApplicantTypeViewSet(APIView):
     authentication_classes = []
     permission_classes = []
     def post(self, request, format=None):
         if request.data:
-            applicant_type = request.data['applicant_category']
+            applicant_type = request.data['applicant_type']
             response_obj = {
                     'status_code': status.HTTP_200_OK,
                     'success': True,
@@ -434,7 +434,7 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                     }
                     return Response(response_obj)
                 _none_necta_applicant_type, created = TBL_App_ApplicantType.objects.get_or_create(
-                                        necta__original_no = _none_necta_applicant.original_no
+                                        none_necta__original_no = _none_necta_applicant.original_no
                                     )
                 
                 _none_necta_applicant_details = TBL_App_ApplicantDetails.objects.get(
@@ -466,12 +466,12 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                     "success": True,
                     'status_code': status.HTTP_200_OK,
                     "message": 'created or updated successifully',
-                    "data": request.data
+                    "data": _applicantSerializer.data
                     }
                 return Response(response_obj)
             else:
                     
-                response_obj={
+                response_obj = {
                 "success": True,
                 'status_code': status.HTTP_200_OK,
                 "message": "We intending to send a request for necta applicant?,if yes, try to change the applcant type",
