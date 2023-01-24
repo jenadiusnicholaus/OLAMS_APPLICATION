@@ -178,7 +178,7 @@ class TBL_App_Applicant(models.Model):
     def __str__(self):
         if self.applicant_details is not None and self.applicant_details.applicant_type.none_necta is None:
             return self.applicant_details.applicant_type.necta.first_name
-        return self.applicant_details.applicant_type.none_necta.firt_name
+        return self.applicant_details.applicant_type.none_necta.original_no
 
 
 class TBL_App_PaymentDetails(models.Model):
@@ -218,6 +218,11 @@ class TBL_App_ApplicantAttendedSchool(models.Model):
 
     def __str__(self):
         return self.center_number
+
+
+
+
+
      
 
 

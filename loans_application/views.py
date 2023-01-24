@@ -10,10 +10,11 @@ from .necta_serializers import *
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework import generics, decorators, permissions, status
-from .external_api import CallExternalApi
+from api_service.external_api import CallExternalApi
 from utils.constants import Constants
 from utils.serialize_models import SerializerManager
 from django.shortcuts import get_object_or_404
+import json
 
 class ApplicantTypeViewSet(APIView):
     authentication_classes = []
@@ -93,9 +94,9 @@ class SearchNetaApplicantViewSet(APIView):
                         try:
                             necta_applicant, created = TBL_App_NECTADetails.objects.get_or_create(
                             index_no = new_index_no,
-                            education_level =  education_level ,
+                            education_level =  education_level,
                             first_name = first_name,
-                            middle_name =  middle_name ,
+                            middle_name =  middle_name,
                             last_name= last_name,
                             sur_name =   sur_name,
                             sex = sex,
@@ -417,11 +418,13 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                 
                 try:
                     _none_necta_applicant =TBL_App_NoneNECTADetails.objects.get( original_no = _index_no, app_year=_app_year)
-                    _none_necta_applicant.first_name=_first_name
-                    _none_necta_applicant.middle_name= _middle_name
-                    _none_necta_applicant.last_name =_last_name
-                    _none_necta_applicant.sex= _new_sex_value
-                    _none_necta_applicant.app_year=_app_year
+                    _none_necta_applicant.first_name = _first_name
+                    _none_necta_applicant.middle_name = _middle_name
+                    _none_necta_applicant.last_name = _last_name
+                    _none_necta_applicant.sex = _new_sex_value
+                    _none_necta_applicant.app_year = _app_year
+                    _none_necta_applicant.exam_year = _exam_year
+                    _none_necta_applicant.app_year = _app_year
                     _none_necta_applicant.exam_year =_exam_year
                     _none_necta_applicant.sur_name = _sur_name
                     _none_necta_applicant.save()
@@ -440,6 +443,7 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                 _none_necta_applicant_details = TBL_App_ApplicantDetails.objects.get(
                                         applicant_type__none_necta__original_no = _none_necta_applicant_type.none_necta.original_no,
                                     )
+
                 _none_necta_applicant_details.phonenumber = _phone_number
                 _none_necta_applicant_details.email = _email
                 _none_necta_applicant_details.save()
@@ -484,5 +488,65 @@ class PreAplicantNoneNectAContactInfosView(APIView):
             
             }
         return Response(response_obj)
+class ChooseApploicantCategory(APIView):
+    """check is Beneficiary?, if yes, is 25% paid?, if yes generate control_n0 for application fee
+                                                if no generate controll number paying 25% for paying 25% """
+    authentication_classes = []
+    permission_classes = []
+    def post(self, request, format=None):
+        _applicant_category = request.data['applicant_category']
+        _index_no = request.data['index_no']
+        response  = CallExternalApi.applicant_loan_Status(index_no=_index_no)
+        parse_json = json.loads(response.text)
 
+        
+        if response.status_code == 200:
+            match _applicant_category:
+
+                case  Constants.PGD:
+                     # generate conntrol number
+                    response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'process PGD',
+                            }
+                    return Response(response_obj)
+                case  Constants.LUG:
+                   
+                
+                    if response["lug"] is not None:
+                        if response['lug']["outstanding25Percent"] == 0:
+
+                            response_obj = {
+                                    "success": True,
+                                    'status_code': status.HTTP_200_OK,
+                                    "message": 'Generate control number for application fee payment',
+                                    'data':  parse_json
+                                    }
+                            return Response(response_obj)
+                        else:
+                            
+                            response_obj = {
+                                    "success": True,
+                                    'status_code': status.HTTP_200_OK,
+                                    "message": 'Generate control number for 25 percent payment',
                                 
+                                    }
+                            return Response(response_obj)
+
+                case Constants.PGDL:
+                    # check is Beneficiary? if yes generate control number for application fee payment
+                    #                       if no display a message, " you must bbe Beneficiary"
+                    response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'Process PGDL',
+                            }
+                    return Response(response_obj)
+        else:
+            response_obj = {
+                            "success": False,
+                            "status_code": response.status_code,
+                            "message": "is not beneficiary"
+                            }
+            return Response(response_obj)

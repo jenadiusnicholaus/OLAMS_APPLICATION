@@ -15,4 +15,5 @@ urlpatterns = [
     path('applicant-existance/', ApplicantExistenceView.as_view()),
     path('pre-applicant-necta-contact-infos/', PreAplicantNectAContactInfosView.as_view()),
     path('pre-applicant-none-necta-contact-infos/', PreAplicantNoneNectAContactInfosView.as_view()),
+    path('choose-apploicant-category/', ChooseApploicantCategory.as_view())
 ]
