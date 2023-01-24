@@ -419,16 +419,17 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                 
                 try:
                     _none_necta_applicant =TBL_App_NoneNECTADetails.objects.get( original_no = _index_no, app_year=_app_year)
-                    _none_necta_applicant.first_name = _first_name
-                    _none_necta_applicant.middle_name = _middle_name
-                    _none_necta_applicant.last_name = _last_name
-                    _none_necta_applicant.sex = _new_sex_value
-                    _none_necta_applicant.app_year = _app_year
-                    _none_necta_applicant.exam_year = _exam_year
-                    _none_necta_applicant.app_year = _app_year
-                    _none_necta_applicant.exam_year =_exam_year
-                    _none_necta_applicant.sur_name = _sur_name
-                    _none_necta_applicant.save()
+                
+                    TBL_App_NoneNECTADetails.objects.filter(id = _none_necta_applicant.id).update( 
+                    first_name = _first_name,
+                    middle_name = _middle_name,
+                    last_name = _last_name,
+                    sex = _new_sex_value,
+                    app_year = _app_year,
+                    exam_year = _exam_year,
+                 
+                  
+                    sur_name = _sur_name)
                 except:
                     response_obj = {
                     "success": False,

@@ -100,7 +100,7 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
 
 
     class Meta:
-        verbose_name = '6:TBL Eduction Diploma infos'
+        verbose_name = '6:TBL Tertiary Education infos'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
 

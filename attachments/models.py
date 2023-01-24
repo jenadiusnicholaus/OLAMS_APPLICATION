@@ -1,4 +1,5 @@
 import os
+from loans_application.models import *
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -9,6 +10,8 @@ class TBL_attachments(models.Model):
     ('',""),
     ('',""),
     )
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="attachment_tbl_app_applicant")
+
     cycle = models.CharField(max_length = 30, null = True)
     docid = models.ForeignKey("TBL_AttachemetsDocs", on_delete=models.DO_NOTHING, related_name="attachement_doc")
     status = models.CharField(max_length=50, null = True)
@@ -33,7 +36,7 @@ class TBL_attachments(models.Model):
 
 
     class Meta:
-        verbose_name ="2: TBL Attachments Docs"
+        verbose_name ="1: TBL Attachments Docs"
         verbose_name_plural =verbose_name
     def __str__(self):
         return self.name

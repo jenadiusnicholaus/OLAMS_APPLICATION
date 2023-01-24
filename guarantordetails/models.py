@@ -9,16 +9,13 @@ from django.contrib.auth.models import User
 class TBL_GuarantorDetailsLUG(models.Model):
     SEX = (
         ('MALE', 'Male'),
-        ('FEMALE', 'Female'),
-
-    )
+        ('FEMALE', 'Female'),)
 
     def image_upload_to(self, instance=None):
         if instance:
             return os.path.join("GuarantorDetailsLUG", self.user.username, instance)
         return None
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_guarantor_details")
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="guarantor_tbl_app_applicant")
     sur_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, null = True)
@@ -47,12 +44,11 @@ class TBL_GuarantorDetailsLUG(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        if self.user.username:
-            return self.user.username
-        return self.user.first_name
+        if self.sur_name:
+            return self.sur_name
+
 
 class TBL_GuarantorDetailsPGD(models.Model):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="user_guarantor_details_pgd")
     postaladdress = models.CharField(max_length=100)
     telephone = PhoneNumberField(null=True)
 
