@@ -15,6 +15,7 @@ from utils.constants import Constants
 from utils.serialize_models import SerializerManager
 from django.shortcuts import get_object_or_404
 import json
+from education_info.models import TBL_Education_ApplicantAttendedSchool
 
 class ApplicantTypeViewSet(APIView):
     authentication_classes = []
@@ -96,7 +97,7 @@ class SearchNetaApplicantViewSet(APIView):
                             index_no = new_index_no,
                             education_level =  education_level,
                             first_name = first_name,
-                            middle_name =  middle_name,
+                            middle_name =  middle_name ,
                             last_name= last_name,
                             sur_name =   sur_name,
                             sex = sex,
@@ -174,7 +175,7 @@ class AddSchoolView(APIView):
             _index_no= request.data['index_no']
             _applcant_application_year = request.data['app_year']
             _exam_year = request.data['exam_year']
-            applicant_school = TBL_App_ApplicantAttendedSchool.objects.filter(center_number=_center_number)
+            applicant_school = TBL_Education_ApplicantAttendedSchool.objects.filter(center_number=_center_number)
             applicant =TBL_App_NECTADetails.objects.get(index_no = _index_no, app_year=_applcant_application_year)
         
             if applicant_school.exists():
@@ -201,7 +202,7 @@ class AddSchoolView(APIView):
                     }
                 return Response(response_obj)
             else:
-                TBL_App_ApplicantAttendedSchool.objects.create(
+                TBL_Education_ApplicantAttendedSchool.objects.create(
                      necta_applicants = applicant,
                     center_number = _center_number,
                     center_name =_center_name,

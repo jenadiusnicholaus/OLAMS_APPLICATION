@@ -25,8 +25,9 @@ class  TBL_App_NECTADetails(models.Model):
     created_at = models.DateTimeField(default = timezone.now)
 
     class Meta:
+        verbose_name = '1.0: TBL App Applicants NECTA User Details'
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App Applicants NECTA User Details'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.first_name
@@ -48,8 +49,9 @@ class  TBL_App_NoneNECTADetails(models.Model):
    
 
     class Meta:
+        verbose_name = '1.1: TBL App Applicants None NECTA User Details'
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App Applicants None NECTA User Details'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return str(self.index_no)
@@ -98,8 +100,9 @@ class TBL_App_ApplicantType(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
+        verbose_name = '2: TBL App ApplicantType'
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App ApplicantType'
+        verbose_name_plural = verbose_name
 
 
     def __str__(self):
@@ -127,8 +130,9 @@ class TBL_App_ApplicantDetails(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
  
     class Meta:
+        verbose_name = '3: TBL App Applicant Details'
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App Applicant Details'
+        verbose_name_plural = verbose_name
         
     def __str__(self):
         if  self.applicant_type:  
@@ -158,8 +162,9 @@ class TBL_App_Categories(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     class Meta:
+        verbose_name = "4: TBL App  Applicants Categories"
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App  Applicants Categories'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
@@ -172,8 +177,9 @@ class TBL_App_Applicant(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
     confirmed = models.BooleanField(default=False)
     class Meta:
+        verbose_name = '5: TBL Applicant Details'
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App Applicants'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         if self.applicant_details is not None and self.applicant_details.applicant_type.none_necta is None:
@@ -197,27 +203,15 @@ class TBL_App_PaymentDetails(models.Model):
 
 
     class Meta:
+        verbose_name = "6: TBL App Payment Details"
         ordering = ['-created_at']
-        verbose_name_plural = 'TBL App Payment Details'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         if self.used_by is None:
             return None
         return 'TBL App Aayment Details'
 
-class TBL_App_ApplicantAttendedSchool(models.Model):
-    necta_applicants = models.ManyToManyField(TBL_App_NECTADetails)
-    center_number = models.CharField(max_length=10, null= True,  blank=True, unique=True)
-    center_name = models.CharField(max_length=10, null= True,  blank=True)
-    updated_at = models.DateTimeField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        ordering = ['-created_at']
-        verbose_name_plural = 'TBL App Applicant Attended Schools'
-
-    def __str__(self):
-        return self.center_number
 
 
 

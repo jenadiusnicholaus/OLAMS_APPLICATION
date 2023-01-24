@@ -3,6 +3,7 @@ from rest_framework import  serializers
 
 from loans_application.none_serializers import NoneNectaApplicantSerializer
 from .models import *
+from education_info.models import TBL_Education_ApplicantAttendedSchool
 
 class NectaApplicantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +21,7 @@ class ApplicantTypeSerialize(serializers.ModelSerializer):
 class SearchedNectaApplicationSerializer(serializers.ModelSerializer):
  
     class Meta:
-        model = TBL_App_ApplicantAttendedSchool
+        model = TBL_Education_ApplicantAttendedSchool
         fields = ['center_number','center_name','center_number','updated_at','updated_at']
 
 
@@ -36,7 +37,6 @@ class ApplicantCategoriesSerialixer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ApplicantSerializer(serializers.ModelSerializer):
-        # applicant_details = serializers.HyperlinkedRelatedField(many=True, view_name='applicant_details', read_only=True)
         application_category = ApplicantCategoriesSerialixer()
         applicant_details = ApplicantDetailsSerializer()
         class Meta:

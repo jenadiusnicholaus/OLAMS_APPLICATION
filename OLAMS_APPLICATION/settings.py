@@ -40,7 +40,15 @@ INSTALLED_APPS = [
     "loans_application",
     "rest_framework",
     "settings",
-    "demographics"
+    "demographics",
+    "education_info",
+    "guarantordetails",
+    "attachments",
+    
+
+    # Third part apps
+    "phone_field",
+    "phonenumber_field"
 ]
 
 MIDDLEWARE = [
