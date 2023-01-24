@@ -100,13 +100,29 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
 
 
     class Meta:
-        verbose_name = '6:TBL Eduction Diploma infos '
+        verbose_name = '6:TBL Eduction Diploma infos'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return "Tertiary Education"\
-        
+        return "Tertiary Education"
+
+
+class TBL_Education_institution(models.Model):
+
+    INSTITUTE_TYPE = (
+        ('DIPLOMA', 'DIPLOMA'),
+        ('HIGH_LEVEL_EDUCATION', 'HIGH LEVEL EDUCTION'),
+    )
+
+    institute_type = models.CharField(choices=INSTITUTE_TYPE, null=True, max_length=20)
+    institute_name = models.CharField(max_length=30, null=True)
+
+    class Meta:
+        verbose_name ="7: TBL Eduction Institute"
+        verbose_name_plural =verbose_name
+    def __str__(self):
+        return self.name
 
 
 
