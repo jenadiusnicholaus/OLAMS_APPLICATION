@@ -13,6 +13,7 @@ from rest_framework import generics, decorators, permissions, status
 from api_service.external_api import CallExternalApi
 from utils.constants import Constants
 from utils.serialize_models import SerializerManager
+from utils.helpers import Helpers
 from django.shortcuts import get_object_or_404
 import json
 from education_info.models import TBL_Education_ApplicantAttendedSchool
@@ -47,9 +48,10 @@ class SearchNetaApplicantViewSet(APIView):
             exam_year = request.data['exam_year']
             app_year = request.data['app_year']
             applicant_type =request.data['applicant_type']
+            new_index_no = Helpers.get_new_index_no(index_no, exam_year)
             _necta_applicant = None
             if applicant_type == Constants.necta:
-                _necta_applicant = TBL_App_NECTADetails.objects.filter(Q(index_no__exact=index_no) & Q(app_year__exact=app_year))
+                _necta_applicant = TBL_App_NECTADetails.objects.filter(Q(index_no__exact=new_index_no) & Q(app_year__exact=app_year))
                 if _necta_applicant.exists():
                     searchedApplicantSerializer = NectaApplicantSerializer(instance = _necta_applicant,many=True)
              
@@ -57,10 +59,14 @@ class SearchNetaApplicantViewSet(APIView):
                         'status_code': status.HTTP_200_OK,
                         "message": "Applicant exists, in pre-application  necta table check for an existence in-progress application table",
                         'success': True,
-                        'data': searchedApplicantSerializer.data[0]
+                        'data': {
+                            "necta_index_no":index_no,
+                            "new_index_no":new_index_no,
+                            'applicant':searchedApplicantSerializer.data[0]}
                     }
                     return Response(response_obj)
                 else:
+
                     try:
                         individual_data =  CallExternalApi.get_individual_necta_particulars(index_no=index_no, exam_year=exam_year)
                     except:
@@ -71,7 +77,7 @@ class SearchNetaApplicantViewSet(APIView):
                         return Response(response_obj)
 
                     if individual_data['status']['code'] != 0:
-                        new_index_no = individual_data['particulars']['index_number']
+                        new_index_no = Helpers.get_new_index_no(individual_data['particulars']['index_number'], exam_year) 
                         first_name = individual_data['particulars']['first_name']
                         middle_name = individual_data['particulars']['middle_name']
                         last_name = individual_data['particulars']['last_name']
@@ -119,12 +125,13 @@ class SearchNetaApplicantViewSet(APIView):
                             "success": False,
                             "message": f"{e}"}
                             return Response(response_obj)
-                        response_obj={
+                        response_obj = {
                             "success": True,
-                            'status_code': status.HTTP_200_OK,
+                            "status_code": status.HTTP_200_OK,
                             "message": "applicant, saved successfull",
                             "data": {
                                     'applicant_type': applicant_type,
+                                    'new_index_no': new_index_no,
                                     'nacta_data':individual_data['particulars']
                             } }
                         return Response(response_obj) 
@@ -132,7 +139,7 @@ class SearchNetaApplicantViewSet(APIView):
                     else:
                         response_obj={
                             "success": True,
-                            'status_code': status.HTTP_200_OK,
+                            'status_code': status.HTTP_404_NOT_FOUND,
                                 "data":individual_data }
 
                         return Response(response_obj)   
@@ -142,20 +149,20 @@ class SearchNetaApplicantViewSet(APIView):
                 #  in  the early stages we use the original_no to search applicant exitance in the  none necta 
                 #  but later after an application has completed, we provide the index_no for further reference 
                 _none_necta_applicant, none_necta_created = TBL_App_NoneNECTADetails.objects.get_or_create(original_no=index_no, app_year=app_year)
-                _searched_none_applicant_serializer = NoneNectaApplicantSerializer(instance= _none_necta_applicant)
+                _searched_none_necta_applicant_serializer = NoneNectaApplicantSerializer(instance= _none_necta_applicant)
                 if none_necta_created:
                     response_obj = {
                             "success": True,
                             'status_code': status.HTTP_200_OK,
                             "message": "Created successifully",
-                            'data':_searched_none_applicant_serializer.data}
+                            'data':_searched_none_necta_applicant_serializer.data}
                     return Response(response_obj)
                 else:
                     response_obj = {
                         'status_code': status.HTTP_200_OK,
                         "message": "Applicant exists, in pre-application  none table check for an existence in-progress application table",
                         'success': True,
-                        'data': _searched_none_applicant_serializer.data
+                        'data': _searched_none_necta_applicant_serializer.data
                     }
                     return Response(response_obj)
         else:
@@ -236,28 +243,40 @@ class ApplicantExistenceView(APIView):
             _applicant_category = request.data['applicant_type']
 
             if _applicant_category == Constants.necta:
-                _necta_applicant =get_object_or_404( TBL_App_NECTADetails, index_no = _index_no)
+               
+                _necta_applicant =TBL_App_NECTADetails.objects.get(  index_no = _index_no, app_year= _app_year)
 
-                _necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
+                _necta_applicant_type, created = TBL_App_ApplicantType.objects.get_or_create(
                                  necta = _necta_applicant
                             )
                           
                 _necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
-                                applicant_type=_necta_applicant_initial_category
+                                applicant_type=_necta_applicant_type
                             )
                 
                 _necta_applicant = TBL_App_Applicant.objects.filter(
                      applicant_details =  _necta_applicant_details
                     )
-                if _necta_applicant.exists():
+            
+                if _necta_applicant.exists():   
+                   
+                    app_d =TBL_App_Applicant.objects.get(
+                     applicant_details =  _necta_applicant_details
+                    )
+            
+                    d, c= TBL_App_PaymentDetails.objects.get_or_create(
+                    applicant =app_d
+                    )
+                    applicant_all_details = PaymentSerializer(instance= d)
 
                     response_obj={
                         "success": True,
                         'status_code': status.HTTP_200_OK,
                         "message":'exits',
-                        "data": request.data
+                        "data": applicant_all_details.data
                         }
                     return Response(response_obj)
+                
                 else:
                     # updete the applicanrt model
                     response_obj={
@@ -288,7 +307,7 @@ class ApplicantExistenceView(APIView):
                     response_obj={
                         "success": True,
                         'status_code': status.HTTP_200_OK,
-                        "message":'exits',
+                        "message":'exists',
                         "data": request.data
                         }
                     return Response(response_obj)
@@ -427,8 +446,6 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                     sex = _new_sex_value,
                     app_year = _app_year,
                     exam_year = _exam_year,
-                 
-                  
                     sur_name = _sur_name)
                 except:
                     response_obj = {
@@ -498,57 +515,226 @@ class ChooseApploicantCategory(APIView):
     def post(self, request, format=None):
         _applicant_category = request.data['applicant_category']
         _index_no = request.data['index_no']
-        response  = CallExternalApi.applicant_loan_Status(index_no=_index_no)
+        _applicant_type = request.data['applicant_type']
+        _app_year = request.data["app_year"]
+        response  = CallExternalApi.applicant_loan_status(index_no=_index_no)
         parse_json = json.loads(response.text)
 
-        
         if response.status_code == 200:
             match _applicant_category:
 
                 case  Constants.PGD:
-                     # generate conntrol number
-                    response_obj = {
+                    _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
+                    control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
+                    _parsed_json = json.loads(control_no_response.text)
+                    if  control_no_response.status_code == 200:
+                        _control_no_status = CallExternalApi.check_control_number_status(
+                            billId=_parsed_json["billRequests"]["billId"]
+                        )
+                        payment_model= Helpers.update_payment_details(applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
+                        
+                        applicant_all_details_serializer = PaymentSerializer(instance= payment_model  )
+                        response_obj = {
                             "success": True,
                             'status_code': status.HTTP_200_OK,
-                            "message": 'process PGD',
+                            "message": 'ok',
+                            "data": applicant_all_details_serializer.data
+                        
                             }
-                    return Response(response_obj)
+                        return Response(response_obj)
+                    else: 
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'something went wrong',
+                            "data": _parsed_json
+                        
+                            }
+                        return Response(response_obj)
+                    
                 case  Constants.LUG:
-                   
-                
-                    if response["lug"] is not None:
-                        if response['lug']["outstanding25Percent"] == 0:
-
-                            response_obj = {
+                    if parse_json["lug"] is not None:
+                        if parse_json['lug']["outstanding25Percent"] == 0:
+                            _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
+                            control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
+                            # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
+                            _parsed_json = json.loads(control_no_response.text)
+                            if  control_no_response.status_code == 200:
+                                _control_no_status = CallExternalApi.check_control_number_status(
+                                    billId=_parsed_json["billRequests"]["billId"]
+                                )
+                                payment_model= Helpers.update_payment_details(applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
+                               
+                                applicant_all_details_serializer = PaymentSerializer(instance= payment_model  )
+                                response_obj = {
                                     "success": True,
                                     'status_code': status.HTTP_200_OK,
-                                    "message": 'Generate control number for application fee payment',
-                                    'data':  parse_json
-                                    }
-                            return Response(response_obj)
-                        else:
-                            
-                            response_obj = {
-                                    "success": True,
-                                    'status_code': status.HTTP_200_OK,
-                                    "message": 'Generate control number for 25 percent payment',
+                                    "message": 'ok',
+                                    "data": applicant_all_details_serializer.data
                                 
                                     }
-                            return Response(response_obj)
+                                return Response(response_obj)
+                            else: 
+                                response_obj = {
+                                    "success": True,
+                                    'status_code': status.HTTP_200_OK,
+                                    "message": 'something went wrong',
+                                    "data": _parsed_json
+                                
+                                    }
+                                return Response(response_obj)
+                           
+                        else:
+                            _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=True )
+
+                            # generate control number
+                            control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
+
+                            # check controll number status
+                            # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
+                            _parsed_json = json.loads(control_no_response.text)
+                            if  control_no_response.status_code == 200:
+                                _control_no_status = CallExternalApi.check_control_number_status(
+                                    billId=_parsed_json["billRequests"]["billId"]
+                                )
+                                payment_model= Helpers.update_payment_details(applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
+                               
+                                applicant_all_details_serializer = PaymentSerializer(instance= payment_model  )
+                                response_obj = {
+                                    "success": True,
+                                    'status_code': status.HTTP_200_OK,
+                                    "message": 'ok',
+                                    "data": applicant_all_details_serializer.data
+                                
+                                    }
+                                return Response(response_obj)
+                            else: 
+                                response_obj = {
+                                    "success": True,
+                                    'status_code': status.HTTP_200_OK,
+                                    "message": 'something went wrong',
+                                    "data": _parsed_json
+                                
+                                    }
+                                return Response(response_obj)
+
+                           
+                    else:
+                        response_obj = {
+                                    "success": True,
+                                    'status_code': status.HTTP_200_OK,
+                                    "message": 'ok',
+                                   "data": parse_json 
+                                    }
+                        return Response(response_obj)
 
                 case Constants.PGDL:
                     # check is Beneficiary? if yes generate control number for application fee payment
                     #                       if no display a message, " you must bbe Beneficiary"
-                    response_obj = {
+                    _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
+                    control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
+                    # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
+                    _parsed_json = json.loads(control_no_response.text)
+                    if  control_no_response.status_code == 200:
+                        _control_no_status = CallExternalApi.check_control_number_status(
+                            billId=_parsed_json["billRequests"]["billId"]
+                        )
+                        payment_model= Helpers.update_payment_details(applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
+                        
+                        applicant_all_details_serializer = PaymentSerializer(instance= payment_model  )
+                        response_obj = {
                             "success": True,
                             'status_code': status.HTTP_200_OK,
-                            "message": 'Process PGDL',
+                            "message": 'ok',
+                            "data": applicant_all_details_serializer.data
+                        
                             }
-                    return Response(response_obj)
+                        return Response(response_obj)
+                    else: 
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'something went wrong',
+                            "data": _parsed_json
+                        
+                            }
+                        return Response(response_obj)
+                           
+                    
         else:
-            response_obj = {
-                            "success": False,
-                            "status_code": response.status_code,
-                            "message": "is not beneficiary"
+            match _applicant_category:
+
+                case  Constants.PGD:
+                    _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
+                    control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
+                    _parsed_json = json.loads(control_no_response.text)
+                    if  control_no_response.status_code == 200:
+                        _control_no_status = CallExternalApi.check_control_number_status(
+                            billId=_parsed_json["billRequests"]["billId"]
+                        )
+                        # payment_model= Helpers.update_payment_details(applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
+                        
+                        applicant_all_details_serializer = PaymentSerializer(instance= payment_model  )
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'ok',
+                            "data": applicant_all_details_serializer.data
+                        
                             }
-            return Response(response_obj)
+                        return Response(response_obj)
+                    else: 
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'something went wrong',
+                            "data": _parsed_json
+                        
+                            }
+                        return Response(response_obj)
+                    
+                case  Constants.LUG:
+                  
+                    _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
+                    control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
+                    # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
+                    _parsed_json = json.loads(control_no_response.text)
+                    if  control_no_response.status_code == 200:
+                        _control_no_status = CallExternalApi.check_control_number_status(
+                            billId=_parsed_json["billRequests"]["billId"]
+                        )
+                        payment_model= Helpers.update_payment_details(applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
+                        
+                        applicant_all_details_serializer = PaymentSerializer(instance= payment_model  )
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'ok',
+                            "data": applicant_all_details_serializer.data
+                        
+                            }
+                        return Response(response_obj)
+                    else: 
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'something went wrong',
+                            "data": _parsed_json
+                        
+                            }
+                        return Response(response_obj)
+                        
+                case Constants.PGDL:
+                   
+                        response_obj = {
+                            "success": True,
+                            'status_code': status.HTTP_200_OK,
+                            "message": 'You must Loan Beneficiary',
+                            "data": _parsed_json
+                        
+                            }
+                        return Response(response_obj)
+                           
+               
+
+  

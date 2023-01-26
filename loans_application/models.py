@@ -177,7 +177,7 @@ class TBL_App_Applicant(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
     confirmed = models.BooleanField(default=False)
     class Meta:
-        verbose_name = '5: TBL Applicant Details'
+        verbose_name = '5: TBL Applicant Conso Tbl'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
 
@@ -191,13 +191,13 @@ class TBL_App_PaymentDetails(models.Model):
     PAYMENY_STATUS = (('no_paid', 'Not Paid'), ('paid', 'Paid'))
     USED_STATUS =  (('not_used', 'No used'), ('used', 'used'))
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant', null=True)
-    payment_status =  models.CharField(max_length=20 ,choices=PAYMENY_STATUS, default=0)
-    control_number = models.CharField(max_length=30, null=False, blank=False )
-    reference =  models.CharField(max_length=30, null=False, blank=False )
-    paid_when =  models.DateTimeField( null=False, blank=False )
-    used_by = models.CharField(max_length=16, null=True, blank=False)
-    used_when = models.DateTimeField(max_length=16, null=False, blank=False )
-    used_status = models.CharField(max_length=16, choices=USED_STATUS, null= False, blank=False )
+    payment_status =  models.CharField(max_length=20 ,choices=PAYMENY_STATUS, default='no_paid',  null=True)
+    control_number = models.CharField(max_length=30, null=True, blank=True )
+    reference =  models.CharField(max_length=30, null=True, blank=True )
+    paid_when =  models.DateTimeField( null=True, blank=True )
+    used_by = models.CharField(max_length=16, null=True, blank=True)
+    used_when = models.DateTimeField(max_length=16, null=True, blank=True )
+    used_status = models.CharField(max_length=16, choices=USED_STATUS, null= True, blank=True )
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -208,9 +208,12 @@ class TBL_App_PaymentDetails(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        if self.used_by is None:
-            return None
-        return 'TBL App Aayment Details'
+        if self.used_by is not None:
+            return self.used_by
+        elif self.applicant.applicant_details.applicant_type.necta:
+            return self.applicant.applicant_details.applicant_type.necta.first_name
+        else:
+            return self.applicant.applicant_details.applicant_type.none_necta.first_name
 
 
 
