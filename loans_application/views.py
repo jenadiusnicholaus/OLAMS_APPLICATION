@@ -519,7 +519,7 @@ class ChooseApploicantCategory(APIView):
         _applicant_type = request.data['applicant_type']
         _app_year = request.data["app_year"]
         response  = CallExternalApi.applicant_loan_status(index_no=_index_no)
-        parse_json = json.loads(response.text)
+        applicant_balance_stts_parse_json = json.loads(response.text)
 
         if response.status_code == 200:
             match _applicant_category:
@@ -554,11 +554,10 @@ class ChooseApploicantCategory(APIView):
                         return Response(response_obj)
                     
                 case  Constants.LUG:
-                    if parse_json["lug"] is not None:
-                        if parse_json['lug']["outstanding25Percent"] == 0:
+                    if applicant_balance_stts_parse_json["lug"] is not None:
+                        if applicant_balance_stts_parse_json['lug']["outstanding25Percent"] == 0:
                             _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
                             control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
-                            # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
                             _parsed_json = json.loads(control_no_response.text)
                             if  control_no_response.status_code == 200:
                                 _control_no_status = CallExternalApi.check_control_number_status(
@@ -592,7 +591,6 @@ class ChooseApploicantCategory(APIView):
                             control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
 
                             # check controll number status
-                            # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
                             _parsed_json = json.loads(control_no_response.text)
                             if  control_no_response.status_code == 200:
                                 _control_no_status = CallExternalApi.check_control_number_status(
@@ -614,7 +612,7 @@ class ChooseApploicantCategory(APIView):
                                     "success": True,
                                     'status_code': status.HTTP_200_OK,
                                     "message": 'something went wrong',
-                                    "data": _parsed_json
+                                    "data": applicant_balance_stts_parse_json
                                 
                                     }
                                 return Response(response_obj)
@@ -625,7 +623,7 @@ class ChooseApploicantCategory(APIView):
                                     "success": True,
                                     'status_code': status.HTTP_200_OK,
                                     "message": 'ok',
-                                   "data": parse_json 
+                                   "data": applicant_balance_stts_parse_json 
                                     }
                         return Response(response_obj)
 
@@ -634,7 +632,6 @@ class ChooseApploicantCategory(APIView):
                     #                       if no display a message, " you must bbe Beneficiary"
                     _request_body = Helpers.control_number_params(applicant_type=_applicant_type, index_no=_index_no, is_25_percent=False )
                     control_no_response  = CallExternalApi.request_control_number(request=json.dumps(_request_body).replace('/', r'\/'))
-                    # Helpers.Control_no_status(control_no_response=control_no_response, applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year)
                     _parsed_json = json.loads(control_no_response.text)
                     if  control_no_response.status_code == 200:
                         _control_no_status = CallExternalApi.check_control_number_status(
