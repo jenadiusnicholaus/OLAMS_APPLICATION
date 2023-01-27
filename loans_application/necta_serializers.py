@@ -18,13 +18,6 @@ class ApplicantTypeSerialize(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SearchedNectaApplicationSerializer(serializers.ModelSerializer):
- 
-    class Meta:
-        model = TBL_Education_ApplicantAttendedSchool
-        fields = ['center_number','center_name','center_number','updated_at','updated_at']
-
-
 class ApplicantDetailsSerializer(serializers.ModelSerializer):
    applicant_type = ApplicantTypeSerialize()
    class Meta:

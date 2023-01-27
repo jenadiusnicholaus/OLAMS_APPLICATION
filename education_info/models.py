@@ -41,7 +41,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.center_number
+        return self.center_na
 
 class TBL_Education_FormFourInfos(models.Model):
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_form4_info_tbl_app_applicant")

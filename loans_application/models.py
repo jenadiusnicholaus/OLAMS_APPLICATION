@@ -35,17 +35,17 @@ class  TBL_App_NECTADetails(models.Model):
 class  TBL_App_NoneNECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     index_no =  models.CharField(max_length= 16, unique=True, null=True, blank=True, editable=False)
-    original_no = models.CharField(max_length= 30)
-    first_name = models.CharField(max_length= 16)
-    middle_name = models.CharField(max_length= 16)
+    original_no = models.CharField(max_length= 30, null=True)
+    first_name = models.CharField(max_length= 16, null=True)
+    middle_name = models.CharField(max_length= 16, null=True)
     last_name = models.CharField(max_length= 16, null= True)
     app_year = models.CharField(max_length= 16, null=True)
     exam_year = models.CharField(max_length= 16, null=True)
-    sur_name = models.CharField(max_length= 16)
+    sur_name = models.CharField(max_length= 16,null=True)
     sex = models.CharField(max_length=20, choices=SEX, null=True, blank=False )
-    updated_at = models.DateTimeField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-    changed_necta = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(default=timezone.now, null=True)
+    created_at = models.DateTimeField(default=timezone.now,null=True)
+    changed_necta = models.BooleanField(default=False, null=True)
    
 
     class Meta:

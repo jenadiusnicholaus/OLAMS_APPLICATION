@@ -120,7 +120,7 @@ class Helpers:
                 }
             return Response(response_obj)
 
-    def updated_applicant_category(index_no,  app_year, applicant_type, applicant_category):
+    def check_applicant_category(index_no,  app_year, applicant_type, applicant_category):
         a_c , c = TBL_App_Categories.objects.get_or_create(
                         name = applicant_category
                     )

@@ -17,6 +17,7 @@ from utils.helpers import Helpers
 from django.shortcuts import get_object_or_404
 import json
 from education_info.models import TBL_Education_ApplicantAttendedSchool
+from education_info.serializers import *
 
 class ApplicantTypeViewSet(APIView):
     authentication_classes = []
@@ -182,45 +183,45 @@ class AddSchoolView(APIView):
             _index_no= request.data['index_no']
             _applcant_application_year = request.data['app_year']
             _exam_year = request.data['exam_year']
-            applicant_school = TBL_Education_ApplicantAttendedSchool.objects.filter(center_number=_center_number)
+            applicant_school, created = TBL_Education_ApplicantAttendedSchool.objects.get_or_create(center_number=_center_number)
             applicant =TBL_App_NECTADetails.objects.get(index_no = _index_no, app_year=_applcant_application_year)
+            
         
-            if applicant_school.exists():
+            if created:
                
-                if applicant_school.first().necta_applicants.filter(
-                    index_no= _index_no,
-                    app_year =_applcant_application_year).exists():
+                if applicant_school.necta_applicants.filter(index_no = applicant.index_no).exists():
                     pass
                 else:
-                    applicant_school.first().necta_applicants.add(applicant)
+                    applicant_school.center_name = _center_name
+                    applicant_school.necta_applicants.add(applicant)
+                    applicant_school.save()
+                    s_serializer = SearchedNectaApplicationSerializer(instance=applicant_school)
+
                     response_obj={
+               
                     "success": True,
                     'status_code': status.HTTP_200_OK,
                     "message": "added applicant information to school table",
-                    "data":request.data
+                    "data": s_serializer.data
                     }
                     return Response(response_obj)
-                applicant_school[0].necta_applicants.add(applicant)
-                response_obj= {
-                    "success": True,
-                    'status_code': status.HTTP_200_OK,
-                    "message": "School exits",
-                    "data":request.data
-                    }
-                return Response(response_obj)
+              
             else:
-                TBL_Education_ApplicantAttendedSchool.objects.create(
-                     necta_applicants = applicant,
-                    center_number = _center_number,
-                    center_name =_center_name,
-                    )
-                response_obj={
-                    "success": True,
-                    'status_code': status.HTTP_200_OK,
-                    "message": "not exists",
-                    "data":request.data
-                    }
-                return Response(response_obj)
+                if applicant_school:
+                    applicant_school.center_name= _center_name
+                    applicant_school.necta_applicants.add(applicant)
+                    applicant_school.save()
+                   
+                    s_serializer = SearchedNectaApplicationSerializer(instance=applicant_school)
+
+                    response_obj={
+                        "success": True,
+                        'status_code': status.HTTP_200_OK,
+                        "message": "ok",
+                        "data":s_serializer.data
+                        }
+                    return Response(response_obj)
+                pass
         else:
             response_obj={
             "success": True,
