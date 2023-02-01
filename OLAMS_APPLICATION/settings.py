@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "demographics",
     "education_info",
     "guarantordetails",
+    "preliminary_info",
     "attachments",
     "corsheaders",
     
