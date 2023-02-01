@@ -61,29 +61,3 @@ class TBL_Demo_District(models.Model):
     def __str__(self):
         
         return self.name
-
-class Tbl_Demo_Disability(models.Model):
-    name = models.CharField(max_length=50, null = True)
-    description = models.TextField( null = True)
-    updated_at = models.DateTimeField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-
-
-    class Meta:
-            verbose_name = "4: TBL Demo Disability"
-            ordering = ['-created_at']
-            verbose_name_plural = verbose_name
-
-    def __str__(self):
-            return self.name
-
-
-
-
-
-    
-
-
-
-
-        
