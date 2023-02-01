@@ -4,17 +4,16 @@ from loans_application.models import *
 class TBL_EducationInfo(models.Model):
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_tbl_app_applicant")
     f4_no_of_seat = models.IntegerField(default=0)
-    pst4ed = models.CharField(max_length=30, null= True)
-    pst4ed = models.CharField(max_length=30, null= True)
-    f4sps = models.CharField(max_length=30, null= True)
-    f4sps_cp =models.CharField(max_length=30, null= True)
-    f4sps_cp_phone = models.CharField(max_length=30, null= True)
-    f4sps_cp_addr = models.CharField(max_length=30, null= True)
-    pst4sps = models.CharField(max_length=30, null= True)
-    pst4sps_cp = models.CharField(max_length=30, null= True)
-    pst4sps_cp_phone = models.CharField(max_length=30, null= True)
-    pst4sps_cp_addr= models.CharField(max_length=30, null= True)
-    ay = models.CharField(max_length=30, null= True)
+    pst4ed = models.CharField(max_length=30, null=True)
+    f4sps = models.CharField(max_length=30, null=True)
+    f4sps_cp =models.CharField(max_length=30, null=True)
+    f4sps_cp_phone = models.CharField(max_length=30, null=True)
+    f4sps_cp_addr = models.CharField(max_length=30, null=True)
+    pst4sps = models.CharField(max_length=30, null=True)
+    pst4sps_cp = models.CharField(max_length=30, null=True)
+    pst4sps_cp_phone = models.CharField(max_length=30, null=True)
+    pst4sps_cp_addr= models.CharField(max_length=30, null=True)
+    ay = models.CharField(max_length=30, null=True)
     confirm = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
@@ -44,7 +43,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
         return self.center_na
 
 class TBL_Education_FormFourInfos(models.Model):
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_form4_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_form4_info_tbl_app_applicant")
 
     index_no = models.CharField(max_length=16)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -63,7 +62,7 @@ class TBL_Education_FormFourInfos(models.Model):
 
 
 class TBL_Education_FormSixInfos(models.Model):
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_form6_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_form6_info_tbl_app_applicant")
     # add some more field here
     index_no = models.CharField(max_length=16)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -78,7 +77,7 @@ class TBL_Education_FormSixInfos(models.Model):
         return self.index_no
 
 class TBL_Education_DiplomaInfos(models.Model):
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_diploma_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_diploma_info_tbl_app_applicant")
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -94,7 +93,7 @@ class TBL_Education_DiplomaInfos(models.Model):
         return 'Diploma Infomations'
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_te_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_te_info_tbl_app_applicant")
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
