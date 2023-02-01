@@ -6,13 +6,13 @@ class TBL_EducationInfo(models.Model):
     f4_no_of_seat = models.IntegerField(default=0)
     pst4ed = models.CharField(max_length=30, null=True)
     f4sps = models.CharField(max_length=30, null=True)
-    f4sps_cp =models.CharField(max_length=30, null=True)
+    f4sps_cp = models.CharField(max_length=30, null=True)
     f4sps_cp_phone = models.CharField(max_length=30, null=True)
     f4sps_cp_addr = models.CharField(max_length=30, null=True)
     pst4sps = models.CharField(max_length=30, null=True)
     pst4sps_cp = models.CharField(max_length=30, null=True)
     pst4sps_cp_phone = models.CharField(max_length=30, null=True)
-    pst4sps_cp_addr= models.CharField(max_length=30, null=True)
+    pst4sps_cp_addr = models.CharField(max_length=30, null=True)
     ay = models.CharField(max_length=30, null=True)
     confirm = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -29,8 +29,8 @@ class TBL_EducationInfo(models.Model):
 
 class TBL_Education_ApplicantAttendedSchool(models.Model):
     necta_applicants = models.ManyToManyField(TBL_App_NECTADetails)
-    center_number = models.CharField(max_length=10, null= True,  blank=True, unique=True)
-    center_name = models.CharField(max_length=10, null= True,  blank=True)
+    center_number = models.CharField(max_length=10, null=True,  blank=True, unique=True)
+    center_name = models.CharField(max_length=10, null=True,  blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
