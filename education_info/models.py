@@ -122,10 +122,10 @@ class TblCourses(models.Model):
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_te_info_tbl_app_applicant")
-    admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False)
+    admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False, default="N")
     admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING, default="N")
-    admittedDegreeCategory = models.CharField(null=False, max_length=15)
-    applicationYear = models.IntegerField(null=False)
+    admittedDegreeCategory = models.CharField(null=False, default="Master", max_length=15)
+    applicationYear = models.IntegerField(null=False, default="2023")
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
