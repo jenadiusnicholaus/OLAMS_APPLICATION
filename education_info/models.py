@@ -102,6 +102,8 @@ class TBL_Education_institution(models.Model):
     institute_type = models.CharField(choices=INSTITUTE_TYPE, null=True, max_length=20)
     institute_name = models.CharField(max_length=30, null=True)
     instituteCode = models.CharField(max_length=15, null=True)
+    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name = "7: TBL Eduction Institute"
@@ -114,12 +116,14 @@ class TBL_Education_institution(models.Model):
 class TblCourses(models.Model):
     courseName = models.CharField(max_length=50, null=False)
     courseCode = models.CharField(max_length=30, null=False)
+    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
 
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_te_info_tbl_app_applicant")
     admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False)
-    admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING)
+    admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING, default="N")
     admittedDegreeCategory = models.CharField(null=False, max_length=15)
     applicationYear = models.IntegerField(null=False)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -135,15 +139,16 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
 
 
 class TblTertiaryEducationAwards(models.Model):
-    tertiaryInfo = models.ForeignKey(TBL_Education_TertiaryEducationInfos, null=False,
+    tertiaryInfo = models.ForeignKey(TBL_Education_TertiaryEducationInfos, null=False, on_delete=models.DO_NOTHING,
                                      related_name="TblAwards_TertiaryInfo")
     award = models.CharField(max_length=50, null=False)
     regno = models.CharField(max_length=40)
     entryYear = models.IntegerField(null=False)
     graduateYear = models.IntegerField(null=False)
-    awardCategory = models.CharField(max_length=20,null=False)
+    awardCategory = models.CharField(max_length=20, null=False)
     gpa = models.FloatField(null=False)
-    institution = models.ForeignKey(TBL_Education_institution, null=False, related_name="TblAwardsInstitution")
+    institution = models.ForeignKey(TBL_Education_institution, null=False, related_name="TblAwardsInstitution",
+                                    on_delete=models.DO_NOTHING)
 
 
 class TblInstitutionCourse(models.Model):
