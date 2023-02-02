@@ -1,4 +1,3 @@
-from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 from loans_application.models import *
@@ -90,7 +89,7 @@ class TblTasafInfo(models.Model):
 
 class TblOtherFormFourNumber(models.Model):
     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
-                                    related_name="tbl_otherform4Indexn_preliminary")
+                                    related_name="TblOtherForm4Number_preliminary")
     otherFormFourIndexNo = models.CharField(max_length=16, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
