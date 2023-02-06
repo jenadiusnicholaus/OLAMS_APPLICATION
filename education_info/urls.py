@@ -6,4 +6,5 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('check-school-existance/', CheckSchoolExistence.as_view()),
 ]

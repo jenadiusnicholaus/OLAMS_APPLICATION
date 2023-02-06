@@ -9,6 +9,8 @@ class Api:
 
         CHECK_CONTROL_NUMBER_STATUS_BASE_URL = "http://192.168.50.226:8070/api/v1/GePG/getControlNoRequestStatus?bill"
 
+        CONTROL_NUMBER_INFOS_BASE_URL = "http://192.168.50.226:8070/api/v1/GePG/getControlNoInformation"
+
     class Methods:
         POST = "POST"
         GET = "GET"

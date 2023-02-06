@@ -5,6 +5,8 @@ from rest_framework.response import Response
 import json
 from rest_framework import generics, decorators, permissions, status
 from api_service.external_api import CallExternalApi
+from education_info.models import *
+from education_info.serializers import *
 
 
 
@@ -63,23 +65,43 @@ class Helpers:
     @staticmethod
     def update_payment_details(applicant_type, index_no, app_year,control_status_res):
         if applicant_type == Constants.necta:
-            _payment_status = "not_paid"
+            _payment_status = "no_paid"
             _control_no = control_status_res['controlNo']
-
-            TBL_App_PaymentDetails.objects.filter(
-                applicant__applicant_details__applicant_type__necta__index_no = index_no,
-                applicant__applicant_details__applicant_type__necta__app_year =  app_year,
-
-                ).update(
-                    payment_status =  _payment_status,
-                    control_number = _control_no,)
+            _control_numner_infos_res = CallExternalApi.get_control_number_infos(_control_no)
             
-            return TBL_App_PaymentDetails.objects.get( 
+            _jsonObj = json.loads(_control_numner_infos_res.text)
+            try:
+                payment_found = _jsonObj['paymentsFound']
+            except:
+                return None
+   
+            
+
+            if payment_found:
+                _payment_status ="paid"
+            else:
+                _payment_status = "no_paid"
+            
+        
+            TBL_App_PaymentDetails.objects.filter(
+                    applicant__applicant_details__applicant_type__necta__index_no = index_no,
+
+                    ).update(
+                        payment_status =  _payment_status,
+                        control_number = _control_no,)
+            
+            
+            try:
+              return  TBL_App_PaymentDetails.objects.get( 
                 applicant__applicant_details__applicant_type__necta__index_no = index_no
 
                 )
+            except:
+                return None
+
+
         else:
-            _payment_status = "not_paid"
+            _payment_status = "no_paid"
             _control_no = control_status_res['controlNo']
             TBL_App_PaymentDetails.objects.filter(
                 applicant__applicant_details__applicant_type__none_necta__index_no = index_no,
@@ -95,7 +117,7 @@ class Helpers:
                 )
 
     @staticmethod
-    def Control_no_status(control_no_response, applicant_type, index_no, app_year):
+    def control_no_status(control_no_response, applicant_type, index_no, app_year):
         _parsed_json = json.loads(control_no_response.text)
         if  control_no_response.status_code == 200:
             _control_no_status = CallExternalApi.check_control_number_status(
@@ -121,7 +143,7 @@ class Helpers:
             return Response(response_obj)
 
     def check_applicant_category(index_no,  app_year, applicant_type, applicant_category):
-        a_c , c = TBL_App_Categories.objects.get_or_create(
+        a_c, c = TBL_App_Categories.objects.get_or_create(
                         name = applicant_category
                     )
 
@@ -141,12 +163,28 @@ class Helpers:
                   application_details__applicant_type__none_necta_app_year=app_year
             )
             return str(applicant.application_category.name)
-       
+
+
+    def addSchool(center_name, center_number, index_no, necta_applicant):
+
+        applicant_school, created = TBL_Education_ApplicantAttendedSchool.objects.get_or_create(center_number=center_number)
+
+        if created:
+
+            if applicant_school.necta_applicants.filter(index_no = necta_applicant.index_no).exists():
+                pass
+
+            else:
+                applicant_school.center_name = center_name
+                applicant_school.necta_applicants.add(necta_applicant)
+                applicant_school.save()
+                s_serializer = ApplicantSchoolInformationSerializer(instance=applicant_school)
+            
 
 
 
 
 
 
-      
+        
 

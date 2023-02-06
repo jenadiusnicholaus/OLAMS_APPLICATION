@@ -3,34 +3,35 @@ import json
 from utils.constants import Constants
 from api_service.apis import Api
 
+
 class CallExternalApi:
     @staticmethod
-    def getparems(index_no, exam_year, exam_id, api_key ):
+    def getparems(index_no, exam_year, exam_id, api_key):
         payload = json.dumps({
-        "index_number": index_no,
-        "exam_year":exam_year,
-        "exam_id": exam_id,
-        "api_key": api_key
+            "index_number": index_no,
+            "exam_year": exam_year,
+            "exam_id": exam_id,
+            "api_key": api_key
         })
         return payload
 
-
     @staticmethod
-    def get_individual_necta_particulars( index_no,exam_year ):
+    def get_individual_necta_particulars(index_no, exam_year):
         exam_id = Constants.form_four_axam_id
         api_key = Constants.api_key
         url = Api.URLS.NECTA_APPLICANT_INFORMATION_BASE_URL
-    
+
         payload = CallExternalApi.getparems(
-            index_no=index_no,exam_year=exam_year,
+            index_no=index_no, exam_year=exam_year,
             exam_id=exam_id, api_key=api_key)
         headers = {
-        'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         }
-        response = requests.request(Api.Methods.POST, url, headers=headers, data=payload)
+        response = requests.request(
+            Api.Methods.POST, url, headers=headers, data=payload)
 
-        json_data = json.loads(response.text )
-    
+        json_data = json.loads(response.text)
+
         return json_data
 
     @staticmethod
@@ -57,13 +58,12 @@ class CallExternalApi:
         _indexNo = _my_request["indexNo"]
         _is25Percent = _my_request["is25Percent"]
 
-
         url = Api.URLS.CONTROL_NUMBER_BASE_URL
 
         payload = json.dumps({
             "billAmount": _billAmount,
             "payerId": _payerId,
-            "noOfExpirationDays":_noOfExpirationDays,
+            "noOfExpirationDays": _noOfExpirationDays,
             "payerName": _payerName,
             "billDesc": _billDesc,
             "billReqUser": _billReqUser,
@@ -77,29 +77,26 @@ class CallExternalApi:
             "is25Percent": _is25Percent
         })
         headers = {
-        'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         }
-        response ={}
-        try:
 
-            response = requests.request(Api.Methods.POST, url, headers=headers, data=payload)
-            
-            return  response
-          
-        except:
-           
-            return  response
+        response = requests.request(
+            Api.Methods.POST, url, headers=headers, data=payload)
+        return response
 
     @staticmethod
     def check_control_number_status(billId):
-        url =  Api.URLS.CHECK_CONTROL_NUMBER_STATUS_BASE_URL+f"Id={billId}"
+        url = Api.URLS.CHECK_CONTROL_NUMBER_STATUS_BASE_URL+f"Id={billId}"
         response = requests.request(Api.Methods.GET, url,)
         if response.status_code == 200:
-            return  json.loads(response.text)
+            return json.loads(response.text)
         return json.loads(response.text)
 
+    @staticmethod
+    def get_control_number_infos(control_numner):
 
+        url = f"{Api.URLS.CONTROL_NUMBER_INFOS_BASE_URL}?controlNo={control_numner}"
 
+        response = requests.request(Api.Methods.GET, url)
 
-
-    
+        return response

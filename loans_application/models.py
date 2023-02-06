@@ -208,12 +208,27 @@ class TBL_App_PaymentDetails(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        if self.used_by is not None:
-            return self.used_by
-        elif self.applicant.applicant_details.applicant_type.necta:
-            return self.applicant.applicant_details.applicant_type.necta.first_name
+        if self.applicant:
+            if self.used_by is not None:
+                return self.used_by
+            elif self.applicant.applicant_details.applicant_type.necta:
+                return self.applicant.applicant_details.applicant_type.necta.first_name
+            else:
+                return self.applicant.applicant_details.applicant_type.none_necta.first_name
         else:
-            return self.applicant.applicant_details.applicant_type.none_necta.first_name
+            return 'None'
+        
+@receiver(post_save, sender=TBL_App_Applicant)
+def create_or_update_applicant_details(sender, instance, created, **kwargs):
+    # for each subject, add class in the table of subjectClass
+    if created:
+        try:
+            TBL_App_PaymentDetails.objects.update_or_create(
+                applicant = instance)
+        except Exception as ex:
+            raise
+    
+        
 
 
 

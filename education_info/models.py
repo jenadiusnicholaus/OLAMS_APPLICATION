@@ -41,7 +41,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.center_na
+        return str(self.center_name)
 
 class TBL_Education_FormFourInfos(models.Model):
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_form4_info_tbl_app_applicant")
@@ -59,7 +59,6 @@ class TBL_Education_FormFourInfos(models.Model):
 
     def __str__(self):
         return self.index_no
-
 
 
 class TBL_Education_FormSixInfos(models.Model):
@@ -81,8 +80,6 @@ class TBL_Education_DiplomaInfos(models.Model):
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_diploma_info_tbl_app_applicant")
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
-
-
     # add some more field here
 
     class Meta:
@@ -119,7 +116,7 @@ class TBL_Education_institution(models.Model):
     institute_name = models.CharField(max_length=30, null=True)
 
     class Meta:
-        verbose_name ="7: TBL Eduction Institute"
+        verbose_name = "7: TBL Eduction Institute"
         verbose_name_plural =verbose_name
     def __str__(self):
         return self.name
