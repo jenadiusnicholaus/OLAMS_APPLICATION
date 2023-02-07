@@ -206,7 +206,7 @@ class SearchNectaApplicantViewSet(APIView):
                 _searched_none_necta_applicant_serializer = NoneNectaApplicantSerializer(
                     instance=_none_necta_applicant)
                 _payment_info = TBL_App_PaymentDetails.objects.filter(
-                                applicant__applicant_details__applicant_type__none_necta__origin_no = index_no
+                                applicant__applicant_details__applicant_type__none_necta__original_no = index_no
                             )
                 _payemnet_info_serilizers =  PaymentSerializer(instance= _payment_info, many=True)
 
@@ -546,8 +546,8 @@ class PreAplicantNoneNectAContactInfosView(APIView):
 
                 # get or create the applicnt table if not  exits
                 applicant, created = TBL_App_Applicant.objects.get_or_create(
-                    applicant_details=_none_necta_applicant_details,
-                    application_category=application_category,
+                    applicant_details = _none_necta_applicant_details,
+                    application_category = application_category,
 
                 )
                 _applicant_infos = TBL_App_Applicant.objects.filter(
@@ -574,9 +574,9 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                 }
                 return Response(response_obj)
         response_obj = {
-            "success": True,
-            'status_code': status.HTTP_200_OK,
-            "message": "No prameter or data specified in the request body",
+            "success": False,
+            'status_code': status.HTTP_400_BAD_REQUEST,
+            "message": "No parameter or data specified in the request body",
 
         }
         return Response(response_obj)
@@ -867,3 +867,84 @@ class ChooseApplicantCategory(APIView):
 
                     }
                     return Response(response_obj)
+
+
+class ApplicationRegistration(APIView):
+    """ After all process  Done including, (Necta, None Necta Table, Applicant and Payment) 
+    Then it's time to Make the applicant be recoginized the authentication system"""
+    authentication_classes = []
+    permission_classes = []
+    def post(self, request, format=None):
+      
+        if request.data:
+            _index_no =  request.data['index_no']
+            _password = request.data['password']
+            _secret_question = request.data['secret_question']
+            _secret_answer = request.data['secret_answer']
+            _transaction_id =  request.data['transaction_id']
+            _applicant_type =  request.data['applicant_type']
+            _applicant_category =  request.data['applicant_category']
+            
+          
+            if _applicant_type == Constants.necta:
+                _username = _index_no
+
+                
+                payment_information = TBL_App_PaymentDetails.objects.get(
+                        applicant__applicant_details__applicant_type__necta__index_no = _index_no
+                    )
+                _email = payment_information.applicant.applicant_details.email
+                u = User.objects.get(username= _username)
+                if u:
+                    pass
+                else:
+                    user= User.objects.create_user(username=_username, email=_email, password=_password)
+                _applicant = TBL_App_Applicant.objects.get(
+                    applicant_details__applicant_type__necta__index_no = _index_no,
+                )
+
+                applicant_profile = TBL_App_Profile.objects.filter(
+                    applicant__id = _applicant.id
+                
+                ).update(
+                    secret_question = _secret_question,
+                    secret_answer = _secret_answer,
+                    confirmed = True
+                )
+
+               
+                
+                payment_serilizer = PaymentSerializer(instance=payment_information)
+
+                response_obj = {
+                                "success": True,
+                                'status_code': status.HTTP_200_OK,
+                                "message": 'Your account is created successfully',
+                                "data": {
+                                    'payment_details' : payment_serilizer.data
+                                }
+
+                                }
+                return Response(response_obj)
+            else:
+                # None Necta:
+                pass
+
+        response_obj = {
+            "success": False,
+            'status_code': status.HTTP_400_BAD_REQUEST,
+            "message": "No parameter or data specified in the request body",
+
+        }
+        return Response(response_obj)
+       
+            
+
+
+
+       
+
+
+
+
+          

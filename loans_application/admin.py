@@ -8,6 +8,8 @@ admin.site.register(TBL_App_Categories)
 admin.site.register(TBL_App_PaymentDetails)
 admin.site.register(TBL_App_ApplicantType)
 
+admin.site.register(TBL_App_Profile)
+
 admin.site.register(TBL_App_Applicant)
 
 

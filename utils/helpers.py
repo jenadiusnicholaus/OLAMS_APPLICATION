@@ -65,7 +65,7 @@ class Helpers:
     @staticmethod
     def update_payment_details(applicant_type, index_no, app_year,control_status_res):
         if applicant_type == Constants.necta:
-            _payment_status = "no_paid"
+            _payment_status = 0
             _control_no = control_status_res['controlNo']
             _control_numner_infos_res = CallExternalApi.get_control_number_infos(_control_no)
             
@@ -78,9 +78,9 @@ class Helpers:
             
 
             if payment_found:
-                _payment_status ="paid"
+                _payment_status = 1
             else:
-                _payment_status = "no_paid"
+                _payment_status = 0
             
         
             TBL_App_PaymentDetails.objects.filter(
@@ -88,7 +88,8 @@ class Helpers:
 
                     ).update(
                         payment_status =  _payment_status,
-                        control_number = _control_no,)
+                        control_number = _control_no,
+                        )
             
             
             try:
@@ -101,7 +102,7 @@ class Helpers:
 
 
         else:
-            _payment_status = "no_paid"
+            _payment_status = 0
             _control_no = control_status_res['controlNo']
             TBL_App_PaymentDetails.objects.filter(
                 applicant__applicant_details__applicant_type__none_necta__index_no = index_no,

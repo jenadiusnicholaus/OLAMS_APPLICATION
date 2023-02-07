@@ -147,7 +147,6 @@ class TBL_App_ApplicantDetails(models.Model):
 
 @receiver(post_save, sender=TBL_App_ApplicantType)
 def create_or_update_applicant_details(sender, instance, created, **kwargs):
-    # for each subject, add class in the table of subjectClass
     if created:
         try:
             TBL_App_ApplicantDetails.objects.update_or_create(
@@ -175,7 +174,7 @@ class TBL_App_Applicant(models.Model):
     application_category = models.ForeignKey(TBL_App_Categories, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_category' )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
-    confirmed = models.BooleanField(default=False)
+   
     class Meta:
         verbose_name = '5: TBL Applicant Conso Tbl'
         ordering = ['-created_at']
@@ -188,16 +187,17 @@ class TBL_App_Applicant(models.Model):
 
 
 class TBL_App_PaymentDetails(models.Model):
-    PAYMENY_STATUS = (('no_paid', 'Not Paid'), ('paid', 'Paid'))
-    USED_STATUS =  (('not_used', 'No used'), ('used', 'used'))
+    PAYMENY_STATUS = ((0, 'Not Paid'), (1, 'Paid'))
+    USED_STATUS =  ((0, 'Not used'), (1, 'Used'))
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant', null=True)
-    payment_status =  models.CharField(max_length=20 ,choices=PAYMENY_STATUS, default='no_paid',  null=True)
+    payment_status =  models.IntegerField(choices=PAYMENY_STATUS, default=0,  null=True)
     control_number = models.CharField(max_length=30, null=True, blank=True )
     reference =  models.CharField(max_length=30, null=True, blank=True )
     paid_when =  models.DateTimeField( null=True, blank=True )
+    amount_paid = models.CharField(max_length=20, null=True, blank=True )
     used_by = models.CharField(max_length=16, null=True, blank=True)
     used_when = models.DateTimeField(max_length=16, null=True, blank=True )
-    used_status = models.CharField(max_length=16, choices=USED_STATUS, null= True, blank=True )
+    used_status = models.IntegerField(choices = USED_STATUS, default=0, null= True, blank=True )
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -217,10 +217,17 @@ class TBL_App_PaymentDetails(models.Model):
                 return self.applicant.applicant_details.applicant_type.none_necta.first_name
         else:
             return 'None'
+    def save(self, *args, **kwargs):
+        if self.applicant.applicant_details.applicant_type.necta :
+            self.used_by = self.applicant.applicant_details.applicant_type.necta.index_no
+            return super(TBL_App_PaymentDetails, self,).save(*args, **kwargs) 
+        elif self.applicant.applicant_details.applicant_type.none_necta:
+            self.used_by = self.applicant.applicant_details.applicant_type.none_necta.original_no
+            return super(TBL_App_PaymentDetails, self,).save(*args, **kwargs) 
+            
         
 @receiver(post_save, sender=TBL_App_Applicant)
 def create_or_update_applicant_details(sender, instance, created, **kwargs):
-    # for each subject, add class in the table of subjectClass
     if created:
         try:
             TBL_App_PaymentDetails.objects.update_or_create(
@@ -229,6 +236,49 @@ def create_or_update_applicant_details(sender, instance, created, **kwargs):
             raise
     
         
+class TBL_App_Profile(models.Model):
+    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_profile_set', null=True)
+    user = models.OneToOneField(User,on_delete= models.DO_NOTHING, related_name= 'user_profile_set', null=True)
+    secret_question = models.CharField(max_length = 100, null = True, blank=True )
+    secret_answer = models.CharField(max_length = 100, null = True, blank=True )
+    confirmed = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "7: Applicant Profile"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        if self.user:
+            return self.user.username
+        elif self.applicant.applicant_details.applicant_type.necta:
+            return self.applicant.applicant_details.applicant_type.necta.first_name
+        elif self.applicant.applicant_details.applicant_type.none_necta:
+            return self.applicant.applicant_details.applicant_type.none_necta.first_name
+        
+@receiver(post_save, sender=TBL_App_Applicant)
+def create_or_update_applicant_details(sender, instance, created, **kwargs):
+    if created:
+        try:
+            TBL_App_Profile.objects.update_or_create(
+                applicant = instance)
+        except Exception as ex:
+            raise ex
+
+@receiver(post_save, sender=User)
+def create_or_update_applicant_details(sender, instance, created, **kwargs):
+    if created:
+        try:
+            TBL_App_Profile.objects.update_or_create(
+                user = instance)
+        except Exception as ex:
+            raise ex
+        
+
+    
+    
+    
+
+
 
 
 
