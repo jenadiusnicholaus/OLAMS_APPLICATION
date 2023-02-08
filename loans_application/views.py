@@ -201,8 +201,11 @@ class SearchNectaApplicantViewSet(APIView):
                 #  The logic for the none necta user
                 #  in  the early stages we use the original_no to search applicant exitance in the  none necta
                 #  but later after an application has completed, we provide the index_no for further reference
-                _none_necta_applicant, none_necta_created = TBL_App_NoneNECTADetails.objects.get_or_create(
-                    original_no=index_no, app_year=app_year)
+                try:
+                    _none_necta_applicant, none_necta_created = TBL_App_NoneNECTADetails.objects.get_or_create(
+                    original_no = index_no)
+                except  TBL_App_NoneNECTADetails.DoesNotExist:
+                    return 
                 _searched_none_necta_applicant_serializer = NoneNectaApplicantSerializer(
                     instance=_none_necta_applicant)
                 _payment_info = TBL_App_PaymentDetails.objects.filter(
@@ -218,7 +221,7 @@ class SearchNectaApplicantViewSet(APIView):
                         "message": "Created successifully",
                         'data':{
                         'applicant': _searched_none_necta_applicant_serializer.data,
-                        'applicant':_payemnet_info_serilizers.data
+                        'payment_details':_payemnet_info_serilizers.data
                         }}
                     return Response(response_obj)
                 else:
@@ -226,7 +229,9 @@ class SearchNectaApplicantViewSet(APIView):
                         'status_code': status.HTTP_200_OK,
                         "message": "Applicant exists, in pre-application  none table check for an existence in-progress application table",
                         'success': True,
-                        'data': _searched_none_necta_applicant_serializer.data
+                        'data':{
+                        'applicant': _searched_none_necta_applicant_serializer.data,
+                        'payment_details':_payemnet_info_serilizers.data}
                     }
                     return Response(response_obj)
         else:
@@ -349,19 +354,9 @@ class ApplicantExistenceView(APIView):
             
 
             else:
-                # process the none nacta
-                _none_necta_applicant = get_object_or_404(
-                    TBL_App_NoneNECTADetails, original_no=_index_no)
-
-                _none_necta_applicant_initial_category, created = TBL_App_ApplicantType.objects.get_or_create(
-                    none_necta=_none_necta_applicant
-                )
-
-                _none_necta_applicant_details, created = TBL_App_ApplicantDetails.objects.get_or_create(
-                    applicant_type=_none_necta_applicant_initial_category
-                )
+               
                 _none_necta_applicant = TBL_App_Applicant.objects.filter(
-                    applicant_details=_none_necta_applicant_details
+                    applicant_details__applicant_type__none_necta__original_no=_index_no
                 )
 
                 if _none_necta_applicant.exists():
@@ -509,7 +504,8 @@ class PreAplicantNoneNectAContactInfosView(APIView):
 
                 try:
                     _none_necta_applicant = TBL_App_NoneNECTADetails.objects.get(
-                        original_no=_index_no, app_year=_app_year)
+                        original_no=_index_no
+                        )
 
                     TBL_App_NoneNECTADetails.objects.filter(id=_none_necta_applicant.id).update(
                         first_name = _first_name,
@@ -528,11 +524,11 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                     }
                     return Response(response_obj)
                 _none_necta_applicant_type, created = TBL_App_ApplicantType.objects.get_or_create(
-                    none_necta__original_no=_none_necta_applicant.original_no
+                    none_necta__original_no = _none_necta_applicant.original_no
                 )
 
                 _none_necta_applicant_details = TBL_App_ApplicantDetails.objects.get(
-                    applicant_type__none_necta__original_no=_none_necta_applicant_type.none_necta.original_no,
+                    applicant_type__none_necta__original_no = _none_necta_applicant_type.none_necta.original_no,
                 )
 
                 _none_necta_applicant_details.phonenumber = _phone_number
@@ -550,11 +546,13 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                     application_category = application_category,
 
                 )
+
                 _applicant_infos = TBL_App_Applicant.objects.filter(
                     applicant_details=_none_necta_applicant_details,
                     application_category=application_category,
 
                 )
+
                 _applicantSerializer = ApplicantSerializer(
                     instance=_applicant_infos, many=True)
 
@@ -562,7 +560,7 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                     "success": True,
                     'status_code': status.HTTP_200_OK,
                     "message": 'created or updated successifully',
-                    "data": _applicantSerializer.data
+                    "data": _applicantSerializer.data[0]
                 }
                 return Response(response_obj)
             else:
@@ -927,8 +925,47 @@ class ApplicationRegistration(APIView):
                                 }
                 return Response(response_obj)
             else:
-                # None Necta:
-                pass
+                _username = _index_no
+
+                
+                payment_information = TBL_App_PaymentDetails.objects.get(
+                        applicant__applicant_details__applicant_type__none_necta__original_no = _index_no
+                    )
+                _email = payment_information.applicant.applicant_details.email
+                _username =payment_information.applicant.applicant_details.applicant_type.none_necta.index_no
+                u = User.objects.get(username= _username)
+                if u:
+                    pass
+                else:
+                    user= User.objects.create_user(username=_username, email=_email, password=_password)
+                _applicant = TBL_App_Applicant.objects.get(
+                    applicant_details__applicant_type__necta__original_no = _index_no,
+                )
+
+                applicant_profile = TBL_App_Profile.objects.filter(
+                    applicant__id = _applicant.id
+                
+                ).update(
+                    secret_question = _secret_question,
+                    secret_answer = _secret_answer,
+                    confirmed = True
+                )
+
+               
+                
+                payment_serilizer = PaymentSerializer(instance=payment_information)
+
+                response_obj = {
+                                "success": True,
+                                'status_code': status.HTTP_200_OK,
+                                "message": 'Your account is created successfully',
+                                "data": {
+                                    'payment_details' : payment_serilizer.data
+                                }
+
+                                }
+                return Response(response_obj)
+                
 
         response_obj = {
             "success": False,

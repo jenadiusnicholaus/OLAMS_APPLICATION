@@ -35,7 +35,7 @@ class  TBL_App_NECTADetails(models.Model):
 class  TBL_App_NoneNECTADetails(models.Model):
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     index_no =  models.CharField(max_length= 16, unique=True, null=True, blank=True, editable=False)
-    original_no = models.CharField(max_length= 30, null=True)
+    original_no = models.CharField(max_length= 30, null=True, unique=True)
     first_name = models.CharField(max_length= 16, null=True)
     middle_name = models.CharField(max_length= 16, null=True)
     last_name = models.CharField(max_length= 16, null= True)
