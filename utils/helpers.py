@@ -73,7 +73,7 @@ class Helpers:
         information endpoint.
         '''
 
-        _payment_status = 0
+       
         _referenceID = None
         _paid_when = None
         _used_by  = None

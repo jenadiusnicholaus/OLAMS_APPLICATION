@@ -216,15 +216,21 @@ class SearchApplicantView(APIView):
                 recent_payments = _payment_info.first()
                 _payemnet_info_serilizers= None
 
-                if recent_payments.control_number is not None:
+                if recent_payments:
+                    # Toddo
+                    # check for control number existance\
+                    if recent_payments.control_number is not None:
 
                     # it returns the updated payment model
-                    payment_model = Helpers.update_payment_details(
-                                    applicant_type = _applicant_type, index_no = _index_no, control_no=recent_payments.control_number)
+                        payment_model = Helpers.update_payment_details(
+                                        applicant_type = _applicant_type, index_no = _index_no, control_no=recent_payments.control_number)
 
 
-                    _payemnet_info_serilizers =  PaymentSerializer(instance = payment_model)
-                _payemnet_info_serilizers =  PaymentSerializer(instance = _payment_info, many=True)
+                        _paymnet_info_serilizers =  PaymentSerializer(instance = payment_model)
+                    else: 
+                        _paymnet_info_serilizers =  PaymentSerializer(instance = recent_payments)
+                else:
+                    _paymnet_info_serilizers =  PaymentSerializer(instance = recent_payments )
 
                 if none_necta_created:
                     response_obj = {
@@ -233,7 +239,7 @@ class SearchApplicantView(APIView):
                         "message": "Created successifully",
                         'data':{
                         'applicant': _searched_none_necta_applicant_serializer.data,
-                        'payment_details':_payemnet_info_serilizers.data[0]
+                        'payment_details':_payemnet_info_serilizers.data
                         }}
                     return Response(response_obj)
                 else:
@@ -243,7 +249,7 @@ class SearchApplicantView(APIView):
                         'success': True,
                         'data':{
                         'applicant': _searched_none_necta_applicant_serializer.data,
-                        'payment_details':_payemnet_info_serilizers.data}
+                        'payment_details':_paymnet_info_serilizers.data}
                     }
                     return Response(response_obj)
         else:
@@ -285,7 +291,7 @@ class AddSchoolView(APIView):
 
                         "success": True,
                         'status_code': status.HTTP_200_OK,
-                        "message": "added applicant information to school table",
+                        "message": "Added applicant information to school table",
                         "data": s_serializer.data
                     }
                     return Response(response_obj)
@@ -617,6 +623,7 @@ class ChooseApplicantCategory(APIView):
 
         if response.status_code == 200:
             match _applicant_category:
+                # add the billing amount in the request body
 
                 case  Constants.PGD:
                     _request_body = Helpers.control_number_params(
