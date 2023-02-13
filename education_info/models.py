@@ -103,7 +103,7 @@ class TBL_Education_institution(models.Model):
     )
 
     institute_type = models.CharField(choices=INSTITUTE_TYPE, null=True, max_length=20)
-    institute_name = models.CharField(max_length=30, null=True)
+    institute_name = models.CharField(max_length=60, null=True)
     instituteCode = models.CharField(max_length=15, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
