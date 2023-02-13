@@ -255,17 +255,20 @@ class TBL_App_Profile(models.Model):
         elif self.applicant.applicant_details.applicant_type.none_necta:
             return self.applicant.applicant_details.applicant_type.none_necta.first_name
         
+
+# updated user profile when applicant is created
 @receiver(post_save, sender=TBL_App_Applicant)
-def create_or_update_applicant_details(sender, instance, created, **kwargs):
+def create_or_update_applicant_inst_profile(sender, instance, created, **kwargs):
     if created:
         try:
             TBL_App_Profile.objects.update_or_create(
                 applicant = instance)
         except Exception as ex:
             raise ex
-
+        
+# update user profile table whe the user is created
 @receiver(post_save, sender=User)
-def create_or_update_applicant_details(sender, instance, created, **kwargs):
+def create_or_update_applicant_profile_user_inst(sender, instance, created, **kwargs):
     if created:
         try:
             TBL_App_Profile.objects.update_or_create(

@@ -5,6 +5,7 @@ from api_service.apis import Api
 
 
 class CallExternalApi:
+    
     @staticmethod
     def getparems(index_no, exam_year, exam_id, api_key):
         payload = json.dumps({

@@ -41,17 +41,17 @@ class ApplicantTypeViewSet(APIView):
         return Response(response_obj)
 
 
-class SearchNectaApplicantViewSet(APIView):
+class SearchApplicantView(APIView):
     authentication_classes = []
     permission_classes = []
 
     def post(self, request, format=None):
         if request.data:
-            index_no = request.data['index_no']
-            exam_year = request.data['exam_year']
+            _index_no = request.data['index_no']
+            _exam_year = request.data['exam_year']
 
-            applicant_type = request.data['applicant_type']
-            new_index_no = Helpers.get_new_index_no(index_no, exam_year)
+            _applicant_type = request.data['applicant_type']
+            _new_index_no = Helpers.get_new_index_no(_index_no, _exam_year)
             _necta_applicant = None
 
             if request.data['app_year'] == "":
@@ -59,15 +59,15 @@ class SearchNectaApplicantViewSet(APIView):
             else:
                 app_year = request.data['app_year']
 
-            if applicant_type == Constants.necta:
+            if _applicant_type == Constants.necta:
                 _necta_applicant = TBL_App_NECTADetails.objects.filter(
-                    Q(index_no__exact=new_index_no))
+                    Q(index_no__exact=_new_index_no))
 
                 applicant_school_information = TBL_Education_ApplicantAttendedSchool.objects.filter(
-                    necta_applicants__index_no=new_index_no)
+                    necta_applicants__index_no=_new_index_no)
                 try:
                     _payment_info = TBL_App_PaymentDetails.objects.filter(
-                        applicant__applicant_details__applicant_type__necta__index_no = new_index_no
+                        applicant__applicant_details__applicant_type__necta__index_no = _new_index_no
                     )
                     _payment_info_serilizers =  PaymentSerializer(instance= _payment_info, many=True)
 
@@ -87,8 +87,8 @@ class SearchNectaApplicantViewSet(APIView):
                         "message": "Applicant exists, in pre-application  necta table check for an existence in-progress application table",
                         'success': True,
                         'data': {
-                            "necta_index_no": index_no,
-                            "new_index_no": new_index_no,
+                            "necta_index_no": _index_no,
+                            "new_index_no": _new_index_no,
                             'applicant': searchedApplicantSerializer.data[0],
                             'school_infos': applicant_attended_school_serializer.data,
                             'payment_details':  _payment_info_serilizers.data
@@ -98,20 +98,20 @@ class SearchNectaApplicantViewSet(APIView):
                     return Response(response_obj)
                 else:
 
-                    try:
-                        individual_data = CallExternalApi.get_individual_necta_particulars(
-                            index_no=index_no, exam_year=exam_year)
+                    # try:
+                    individual_data = CallExternalApi.get_individual_necta_particulars(
+                        index_no=_index_no, exam_year=_exam_year)
 
-                    except:
-                        response_obj = {
-                            'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            "success": False,
-                            "message": "Somethng went wrong"}
-                        return Response(response_obj)
+                    # except:
+                    #     response_obj = {
+                    #         'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    #         "success": False,
+                    #         "message": "Somethng went wrong"}
+                    #     return Response(response_obj)
 
                     if individual_data['status']['code'] != 0:
                         new_index_no = Helpers.get_new_index_no(
-                            individual_data['particulars']['index_number'], exam_year)
+                            individual_data['particulars']['index_number'], _exam_year)
                         first_name = individual_data['particulars']['first_name']
                         middle_name = individual_data['particulars']['middle_name']
                         last_name = individual_data['particulars']['last_name']
@@ -130,7 +130,7 @@ class SearchNectaApplicantViewSet(APIView):
 
                         sur_name = ''
                         app_year = app_year
-                        exam_year = exam_year
+                        exam_year = _exam_year
                         # in the front-end allow the user to confirm the his/her information
                         try:
                             necta_applicant, created = TBL_App_NECTADetails.objects.get_or_create(
@@ -181,7 +181,7 @@ class SearchNectaApplicantViewSet(APIView):
                             "status_code": status.HTTP_200_OK,
                             "message": "Applicant, saved successfull",
                             "data": {
-                                'applicant_type': applicant_type,
+                                'applicant_type': _applicant_type,
                                 'new_index_no': new_index_no,
                                 'applicant': necta_serializer.data,
                                 'school_infos': applicant_attended_school_serializer.data[0],
@@ -203,16 +203,28 @@ class SearchNectaApplicantViewSet(APIView):
                 #  but later after an application has completed, we provide the index_no for further reference
                 try:
                     _none_necta_applicant, none_necta_created = TBL_App_NoneNECTADetails.objects.get_or_create(
-                    original_no = index_no)
+                    original_no = _index_no)
                 except  TBL_App_NoneNECTADetails.DoesNotExist:
                     return 
                 _searched_none_necta_applicant_serializer = NoneNectaApplicantSerializer(
-                    instance=_none_necta_applicant)
+                    instance = _none_necta_applicant
+                    )
                 _payment_info = TBL_App_PaymentDetails.objects.filter(
-                                applicant__applicant_details__applicant_type__none_necta__original_no = index_no
+                                applicant__applicant_details__applicant_type__none_necta__original_no = _index_no
                             )
-                _payemnet_info_serilizers =  PaymentSerializer(instance= _payment_info, many=True)
+              
+                recent_payments = _payment_info.first()
+                _payemnet_info_serilizers= None
 
+                if recent_payments.control_number is not None:
+
+                    # it returns the updated payment model
+                    payment_model = Helpers.update_payment_details(
+                                    applicant_type = _applicant_type, index_no = _index_no, control_no=recent_payments.control_number)
+
+
+                    _payemnet_info_serilizers =  PaymentSerializer(instance = payment_model)
+                _payemnet_info_serilizers =  PaymentSerializer(instance = _payment_info, many=True)
 
                 if none_necta_created:
                     response_obj = {
@@ -221,7 +233,7 @@ class SearchNectaApplicantViewSet(APIView):
                         "message": "Created successifully",
                         'data':{
                         'applicant': _searched_none_necta_applicant_serializer.data,
-                        'payment_details':_payemnet_info_serilizers.data
+                        'payment_details':_payemnet_info_serilizers.data[0]
                         }}
                     return Response(response_obj)
                 else:
@@ -238,7 +250,7 @@ class SearchNectaApplicantViewSet(APIView):
             response_obj = {
                 "success": True,
                 'status_code': status.HTTP_200_OK,
-                "message": "No request boy detected"}
+                "message": "No request body detected"}
             return Response(response_obj)
 
 
@@ -329,16 +341,24 @@ class ApplicantExistenceView(APIView):
                        applicant_details__applicant_type__necta__index_no= _index_no
                     )
 
-                    d, c = TBL_App_PaymentDetails.objects.get_or_create(
+                    payments, cretaed = TBL_App_PaymentDetails.objects.get_or_create(
                         applicant=app_d
                     )
-                    applicant_all_details = PaymentSerializer(instance=d)
+                    _applicant_all_details = PaymentSerializer(instance=payments)
+                    _control_numner_infos_res = {}
+
+                    if payments.control_number is not None:
+                        _control_numner_infos_res = CallExternalApi.get_control_number_infos(control_numner= payments.control_number)
+                        _parsedJson = json.dumps(_control_numner_infos_res.text)
+                        if _parsedJson['paymentFound']:
+                            payments.reference = _parsedJson['']
+                            payments.payment_status
 
                     response_obj = {
                         "success": True,
                         'status_code': status.HTTP_200_OK,
                         "message": 'exits',
-                        "data": applicant_all_details.data
+                        "data": _applicant_all_details.data
                     }
                     return Response(response_obj)
 
@@ -786,10 +806,11 @@ class ChooseApplicantCategory(APIView):
                     _parsed_json = json.loads(control_no_response.text)
 
                     if control_no_response.status_code == 200:
-
-                        _control_no_status = CallExternalApi.check_control_number_status(
-                            billId=_parsed_json["billRequests"]["billId"]
-                        )
+                        try:
+                            _control_no_status = CallExternalApi.check_control_number_status(
+                                billId=_parsed_json["billRequests"]["billId"])
+                        except:
+                            pass
 
                         payment_model = Helpers.update_payment_details(
                             applicant_type=_applicant_type, index_no=_index_no, app_year=_app_year, control_status_res=_control_no_status)
@@ -799,7 +820,7 @@ class ChooseApplicantCategory(APIView):
                         response_obj = {
                             "success": True,
                             'status_code': status.HTTP_200_OK,
-                            "message": 'ok',
+                            "message": 'The control Number provided should be used to make payments for your loan application',
                             "data": applicant_all_details_serializer.data
 
                         }
@@ -840,7 +861,7 @@ class ChooseApplicantCategory(APIView):
                         response_obj = {
                             "success": True,
                             'status_code': status.HTTP_200_OK,
-                            "message": 'ok',
+                            "message": 'The control Number provided should be used to make payments for your loan application',
                             "data": applicant_all_details_serializer.data
 
                         }
@@ -892,10 +913,9 @@ class ApplicationRegistration(APIView):
                         applicant__applicant_details__applicant_type__necta__index_no = _index_no
                     )
                 _email = payment_information.applicant.applicant_details.email
-                u = User.objects.get(username= _username)
-                if u:
-                    pass
-                else:
+                try:
+                    u = User.objects.get(username= _username)
+                except:
                     user= User.objects.create_user(username=_username, email=_email, password=_password)
                 _applicant = TBL_App_Applicant.objects.get(
                     applicant_details__applicant_type__necta__index_no = _index_no,
@@ -931,16 +951,20 @@ class ApplicationRegistration(APIView):
                 payment_information = TBL_App_PaymentDetails.objects.get(
                         applicant__applicant_details__applicant_type__none_necta__original_no = _index_no
                     )
+                
                 _email = payment_information.applicant.applicant_details.email
                 _username =payment_information.applicant.applicant_details.applicant_type.none_necta.index_no
-                u = User.objects.get(username= _username)
-                if u:
-                    pass
-                else:
+
+                try:
+                    u = User.objects.get(username= _username)
+                except:
                     user= User.objects.create_user(username=_username, email=_email, password=_password)
-                _applicant = TBL_App_Applicant.objects.get(
-                    applicant_details__applicant_type__necta__original_no = _index_no,
-                )
+             
+        
+            #    fix me with get method
+                _applicant = TBL_App_Applicant.objects.filter(
+                    applicant_details__applicant_type__none_necta__original_no = _index_no,
+                ).first()
 
                 applicant_profile = TBL_App_Profile.objects.filter(
                     applicant__id = _applicant.id
@@ -950,8 +974,6 @@ class ApplicationRegistration(APIView):
                     secret_answer = _secret_answer,
                     confirmed = True
                 )
-
-               
                 
                 payment_serilizer = PaymentSerializer(instance=payment_information)
 
