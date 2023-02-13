@@ -10,6 +10,7 @@ from utils.constants import Constants
 
 
 class  TBL_App_NECTADetails(models.Model):
+    id = models.AutoField(primary_key=True)
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     NECTA_STUDENT_ED_LEVEL_STATUS = (('FORM_4', 'FORM FOUR'),('FORM_6', 'FORM SIX'),)
     index_no = models.CharField(max_length = 16, unique = False, null=True, blank=True)
@@ -33,6 +34,7 @@ class  TBL_App_NECTADetails(models.Model):
         return self.first_name
 
 class  TBL_App_NoneNECTADetails(models.Model):
+    id = models.AutoField(primary_key=True)
     SEX = (('MALE', 'Male'),('FEMALE', 'Female'))
     index_no =  models.CharField(max_length= 16, unique=True, null=True, blank=True, editable=False)
     original_no = models.CharField(max_length= 30, null=True, unique=True)
@@ -90,6 +92,7 @@ class  TBL_App_NoneNECTADetails(models.Model):
 
 
 class TBL_App_ApplicantType(models.Model):
+    id = models.AutoField(primary_key=True)
     """
      Initially the applicant category can be necta on none necta
     """
@@ -123,6 +126,7 @@ def create_or_update_applicant_type(sender, instance, created, **kwargs):
 
         
 class TBL_App_ApplicantDetails(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant_type = models.ForeignKey(TBL_App_ApplicantType, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tbl_app_initial_applicant_type')
     phonenumber = models.CharField(max_length= 15, null= False, blank=False)
     email = models.EmailField(max_length= 30,null = True, blank=True)
@@ -156,6 +160,7 @@ def create_or_update_applicant_details(sender, instance, created, **kwargs):
     
         
 class TBL_App_Categories(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20, null = True,blank=True)
     description = models.TextField( null = True, blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -170,6 +175,7 @@ class TBL_App_Categories(models.Model):
 
 
 class TBL_App_Applicant(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant_details = models.ForeignKey(TBL_App_ApplicantDetails,  on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_details')
     application_category = models.ForeignKey(TBL_App_Categories, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_category' )
     created_at = models.DateTimeField(default=timezone.now)
@@ -187,6 +193,7 @@ class TBL_App_Applicant(models.Model):
 
 
 class TBL_App_PaymentDetails(models.Model):
+    id = models.AutoField(primary_key=True)
     PAYMENY_STATUS = ((0, 'Not Paid'), (1, 'Paid'))
     USED_STATUS =  ((0, 'Not used'), (1, 'Used'))
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant', null=True)
@@ -237,6 +244,7 @@ def create_or_update_applicant_details(sender, instance, created, **kwargs):
     
         
 class TBL_App_Profile(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_profile_set', null=True)
     user = models.OneToOneField(User,on_delete= models.DO_NOTHING, related_name= 'user_profile_set', null=True)
     secret_question = models.CharField(max_length = 100, null = True, blank=True )

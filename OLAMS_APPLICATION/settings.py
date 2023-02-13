@@ -97,18 +97,18 @@ WSGI_APPLICATION = "OLAMS_APPLICATION.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'olams_new',
-        'USER': 'root2',
-        'PASSWORD': '123456',
-        'HOST': '192.168.50.145',
-        'PORT': '3306',
-    }
-    #  'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'olams_new',
+    #     'USER': 'root2',
+    #     'PASSWORD': '123456',
+    #     'HOST': '192.168.50.145',
+    #     'PORT': '3306',
     # }
+     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 

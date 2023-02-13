@@ -5,6 +5,7 @@ from loans_application.models import *
 
 # Create your models here.
 class TblPreliminaryInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True,
                                   related_name="tbl_preliminary_applicant")
     applicantDisable = models.BooleanField()
@@ -23,6 +24,7 @@ class TblPreliminaryInfo(models.Model):
 
 
 class TblParentsInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
                                     related_name="tbl_parent_preliminary")
     firstName = models.CharField(max_length=40, null=False)
@@ -39,6 +41,7 @@ class TblParentsInfo(models.Model):
 
 
 class TblParentDeathInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
                                     related_name="tbl_parentsDeathInfo_preliminary")
     deathCertificateNo = models.CharField(max_length=40, null=False)
@@ -49,6 +52,7 @@ class TblParentDeathInfo(models.Model):
 
 
 class TblDisability(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, null=False)
     description = models.TextField(null=True)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -64,6 +68,7 @@ class TblDisability(models.Model):
 
 
 class TblDisabilityInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING, null=False,
                                     related_name="tbl_disabilityInfo_preliminary")
     disabilityType = models.ForeignKey(TblDisability, on_delete=models.DO_NOTHING, null=False,
@@ -74,6 +79,7 @@ class TblDisabilityInfo(models.Model):
 
 
 class TblTasafInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
                                     related_name="tbl_tasaf_preliminary")
     firstName = models.CharField(null=False, max_length=40)
@@ -88,6 +94,7 @@ class TblTasafInfo(models.Model):
 
 
 class TblOtherFormFourNumber(models.Model):
+    id = models.AutoField(primary_key=True)
     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
                                     related_name="TblOtherForm4Number_preliminary")
     otherFormFourIndexNo = models.CharField(max_length=16, null=False)

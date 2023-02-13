@@ -2,6 +2,7 @@ from django.db import models
 from loans_application.models import *
 
 class TBL_EducationInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="ed_tbl_app_applicant")
     f4_no_of_seat = models.IntegerField(default=0)
     pst4ed = models.CharField(max_length=30, null=True)
@@ -28,6 +29,7 @@ class TBL_EducationInfo(models.Model):
         return self.name
 
 class TBL_Education_ApplicantAttendedSchool(models.Model):
+    id = models.AutoField(primary_key=True)
     necta_applicants = models.ManyToManyField(TBL_App_NECTADetails)
     center_number = models.CharField(max_length=10, null=True,  blank=True, unique=True)
     center_name = models.CharField(max_length=10, null=True,  blank=True)
@@ -43,6 +45,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
         return str(self.center_name)
 
 class TBL_Education_FormFourInfos(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_form4_info_tbl_app_applicant")
 
     index_no = models.CharField(max_length=16)
@@ -61,6 +64,7 @@ class TBL_Education_FormFourInfos(models.Model):
 
 
 class TBL_Education_FormSixInfos(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_form6_info_tbl_app_applicant")
     # add some more field here
     index_no = models.CharField(max_length=16)
@@ -76,6 +80,7 @@ class TBL_Education_FormSixInfos(models.Model):
         return self.index_no
 
 class TBL_Education_DiplomaInfos(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_diploma_info_tbl_app_applicant")
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
@@ -91,6 +96,7 @@ class TBL_Education_DiplomaInfos(models.Model):
 
 
 class TBL_Education_institution(models.Model):
+    id = models.AutoField(primary_key=True)
     INSTITUTE_TYPE = (
         ('DIPLOMA', 'DIPLOMA'),
         ('HIGH_LEVEL_EDUCATION', 'HIGH LEVEL EDUCTION'),
@@ -111,6 +117,7 @@ class TBL_Education_institution(models.Model):
 
 
 class TblCourses(models.Model):
+    id = models.AutoField(primary_key=True)
     courseName = models.CharField(max_length=50, null=False)
     courseCode = models.CharField(max_length=30, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -118,6 +125,7 @@ class TblCourses(models.Model):
 
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
+    id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_te_info_tbl_app_applicant")
     admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False, default=0)
     admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING, default=0)
@@ -136,6 +144,7 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
 
 
 class TblTertiaryEducationAwards(models.Model):
+    id = models.AutoField(primary_key=True)
     tertiaryInfo = models.ForeignKey(TBL_Education_TertiaryEducationInfos, null=False, on_delete=models.DO_NOTHING,
                                      related_name="TblAwards_TertiaryInfo")
     award = models.CharField(max_length=50, null=False)
@@ -149,6 +158,7 @@ class TblTertiaryEducationAwards(models.Model):
 
 
 class TblInstitutionCourse(models.Model):
+    id = models.AutoField(primary_key=True)
     institution = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False)
     course = models.ForeignKey(TblCourses, on_delete=models.DO_NOTHING, null=False)
 

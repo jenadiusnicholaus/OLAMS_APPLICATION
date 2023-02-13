@@ -42,6 +42,7 @@ class ApplicantTypeViewSet(APIView):
 
 
 class SearchApplicantView(APIView):
+
     authentication_classes = []
     permission_classes = []
 
@@ -98,16 +99,16 @@ class SearchApplicantView(APIView):
                     return Response(response_obj)
                 else:
 
-                    # try:
-                    individual_data = CallExternalApi.get_individual_necta_particulars(
-                        index_no=_index_no, exam_year=_exam_year)
+                    try:
+                        individual_data = CallExternalApi.get_individual_necta_particulars(
+                            index_no=_index_no, exam_year=_exam_year)
 
-                    # except:
-                    #     response_obj = {
-                    #         'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    #         "success": False,
-                    #         "message": "Somethng went wrong"}
-                    #     return Response(response_obj)
+                    except:
+                        response_obj = {
+                            'status_code': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            "success": False,
+                            "message": "Somethng went wrong"}
+                        return Response(response_obj)
 
                     if individual_data['status']['code'] != 0:
                         new_index_no = Helpers.get_new_index_no(
@@ -338,13 +339,13 @@ class ApplicantExistenceView(APIView):
             if _applicant_category == Constants.necta:
                
                 _necta_applicant = TBL_App_Applicant.objects.filter(
-                    applicant_details__applicant_type__necta__index_no= _index_no
+                    applicant_details__applicant_type__necta__index_no=_index_no
                 )
 
                 if _necta_applicant.exists():
 
                     app_d = TBL_App_Applicant.objects.get(
-                       applicant_details__applicant_type__necta__index_no= _index_no
+                       applicant_details__applicant_type__necta__index_no=_index_no
                     )
 
                     payments, cretaed = TBL_App_PaymentDetails.objects.get_or_create(
@@ -357,9 +358,12 @@ class ApplicantExistenceView(APIView):
                         _control_numner_infos_res = CallExternalApi.get_control_number_infos(control_numner= payments.control_number)
                         _parsedJson = json.dumps(_control_numner_infos_res.text)
                         if _parsedJson['paymentFound']:
+
+                            # TODO:
+                            # update the table from GPG for the paid control nunmber.
                             payments.reference = _parsedJson['']
                             payments.payment_status
-
+ 
                     response_obj = {
                         "success": True,
                         'status_code': status.HTTP_200_OK,

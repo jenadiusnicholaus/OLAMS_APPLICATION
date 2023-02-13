@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 
 class TBL_GuarantorDetailsLUG(models.Model):
+    id = models.AutoField(primary_key=True)
     SEX = (
         ('MALE', 'Male'),
         ('FEMALE', 'Female'),)
@@ -49,6 +50,7 @@ class TBL_GuarantorDetailsLUG(models.Model):
 
 
 class TBL_GuarantorDetailsPGD(models.Model):
+    id = models.AutoField(primary_key=True)
     postaladdress = models.CharField(max_length=100)
     telephone = PhoneNumberField(null=True)
 
