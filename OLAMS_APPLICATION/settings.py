@@ -102,9 +102,18 @@ DATABASES = {
         'NAME': 'olams_new',
         'USER': 'root2',
         'PASSWORD': '123456',
-        'HOST': '192.168.50.145',
+        'HOST': '217.29.129.4',
         'PORT': '3306',
     }
+# 'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'olams_new',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         # 'HOST': '192.168.50.145',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
     #  'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': BASE_DIR / 'db.sqlite3',

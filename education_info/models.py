@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.db import models
 from loans_application.models import *
 
@@ -127,8 +129,8 @@ class TblCourses(models.Model):
 class TBL_Education_TertiaryEducationInfos(models.Model):
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_te_info_tbl_app_applicant")
-    admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False, default=0)
-    admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING, default=0)
+    admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False)
+    admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING)
     admittedDegreeCategory = models.CharField(null=False, default="Master", max_length=15)
     applicationYear = models.IntegerField(null=False, default="2023")
     updated_at = models.DateTimeField(default=timezone.now)
@@ -145,7 +147,7 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
 
 class TblTertiaryEducationAwards(models.Model):
     id = models.AutoField(primary_key=True)
-    tertiaryInfo = models.ForeignKey(TBL_Education_TertiaryEducationInfos, null=False, on_delete=models.DO_NOTHING,
+    tertiaryInfo = models.ForeignKey(TBL_Education_TertiaryEducationInfos, null=True, on_delete=models.DO_NOTHING,
                                      related_name="TblAwards_TertiaryInfo")
     award = models.CharField(max_length=50, null=False)
     regno = models.CharField(max_length=40)
