@@ -25,6 +25,7 @@ class TBL_EducationInfo(models.Model):
         verbose_name = "1: TBL Education"
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_education_info'
 
     def __str__(self):
         
@@ -42,6 +43,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
         verbose_name = '2: TBL Education Applicant Attended Schools'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_secondary_schools'
 
     def __str__(self):
         return str(self.center_name)
@@ -60,6 +62,7 @@ class TBL_Education_FormFourInfos(models.Model):
         verbose_name = '3: TBL Eduction Form four infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_form_four_details'
 
     def __str__(self):
         return self.index_no
@@ -77,6 +80,7 @@ class TBL_Education_FormSixInfos(models.Model):
         verbose_name = '4:TBL Eduction Form Six infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_form_six_details'
 
     def __str__(self):
         return self.index_no
@@ -92,6 +96,7 @@ class TBL_Education_DiplomaInfos(models.Model):
         verbose_name = '5:TBL Eduction Diploma infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_diploma_details'
 
     def __str__(self):
         return 'Diploma Infomations'
@@ -106,16 +111,17 @@ class TBL_Education_institution(models.Model):
 
     institute_type = models.CharField(choices=INSTITUTE_TYPE, null=True, max_length=20)
     institute_name = models.CharField(max_length=60, null=True)
-    instituteCode = models.CharField(max_length=15, null=True)
+    instituteCode = models.CharField(max_length=35, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name = "7: TBL Eduction Institute"
         verbose_name_plural = verbose_name
+        db_table = 'tbl_diploma_institutions'
 
     def __str__(self):
-        return self.name
+        return self.institute_name
 
 
 class TblCourses(models.Model):
@@ -124,6 +130,14 @@ class TblCourses(models.Model):
     courseCode = models.CharField(max_length=30, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "8. TBL_COURSES"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_courses'
+
+    def __str__(self):
+        return self.courseCode
 
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
@@ -140,9 +154,10 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
         verbose_name = '6:TBL Tertiary Education infos'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_tertiary_education'
 
     def __str__(self):
-        return "Tertiary Education"
+        return self.admittedInstitute
 
 
 class TblTertiaryEducationAwards(models.Model):
@@ -158,11 +173,25 @@ class TblTertiaryEducationAwards(models.Model):
     institution = models.ForeignKey(TBL_Education_institution, null=False, related_name="TblAwardsInstitution",
                                     on_delete=models.DO_NOTHING)
 
+    class Meta:
+        verbose_name = "9. Tertiary Education Award"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_tertiary_education_awards'
+
+    def __str__(self):
+        return self.award
 
 class TblInstitutionCourse(models.Model):
     id = models.AutoField(primary_key=True)
     institution = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False)
     course = models.ForeignKey(TblCourses, on_delete=models.DO_NOTHING, null=False)
 
+    class Meta:
+        verbose_name ="10: Institution Course"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_institutioncourses'
+
+    def __str__(self):
+        return self.institution + " " + self.course
 
 

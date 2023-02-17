@@ -21,7 +21,13 @@ class TblPreliminaryInfo(models.Model):
     confirm = models.BooleanField(default=0)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+    class Meta:
+        verbose_name ="Tbl preliminary info"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_preliminary_info'
 
+    def __str__(self):
+        return  self.appYear
 
 class TblParentsInfo(models.Model):
     id = models.AutoField(primary_key=True)
@@ -38,7 +44,13 @@ class TblParentsInfo(models.Model):
     applicantRelationship = models.CharField(null=False, max_length=20)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+    class Meta:
+        verbose_name ="tbl Parents details"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_parents_details'
 
+    def __str__(self):
+        return self.firstName
 
 class TblParentDeathInfo(models.Model):
     id = models.AutoField(primary_key=True)
@@ -49,6 +61,14 @@ class TblParentDeathInfo(models.Model):
     applicantRelationship = models.CharField(null=False, max_length=20)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "tbl Parent Death Details"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_parent_death_details'
+
+    def __str__(self):
+        return self.deceasedName
 
 
 class TblDisability(models.Model):
@@ -62,6 +82,7 @@ class TblDisability(models.Model):
         verbose_name = "4: TBL Disability"
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_disability'
 
     def __str__(self):
         return self.name
@@ -77,6 +98,12 @@ class TblDisabilityInfo(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        verbose_name ="tbl disability details"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_disability_details'
+    def __str__(self):
+        return  self.disabilityType + " " + self.disabledPerson
 
 class TblTasafInfo(models.Model):
     id = models.AutoField(primary_key=True)
@@ -91,6 +118,12 @@ class TblTasafInfo(models.Model):
     gender = models.CharField(max_length=10, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+    class Meta:
+        verbose_name ="Tbl tasaf details"
+        verbose_name_plural = verbose_name;
+        db_table = 'tbl_tasaf_details'
+    def __str__(self):
+        return self.firstName + " "+ self.lastName + " " + self.registrationNo
 
 
 class TblOtherFormFourNumber(models.Model):
@@ -100,3 +133,9 @@ class TblOtherFormFourNumber(models.Model):
     otherFormFourIndexNo = models.CharField(max_length=16, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
+    class Meta:
+        verbose_name = "tbl other Form four Numbers"
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_other_form_four_index_numbers'
+    def __str__(self):
+        return self.otherFormFourIndexNo + " " + self.preliminary.appYear

@@ -30,14 +30,7 @@ class TBL_attachments(models.Model):
     class Meta:
         verbose_name ="1: TBL Attachments Docs"
         verbose_name_plural =verbose_name
-    def __str__(self):
-        return self.name
-
-
-
-    class Meta:
-        verbose_name ="1: TBL Attachments Docs"
-        verbose_name_plural =verbose_name
+        db_table = 'tbl_application_attachments'
     def __str__(self):
         return self.name
 
@@ -53,6 +46,7 @@ class TBL_AttachemetsDocs(models.Model):
     class Meta:
         verbose_name ="2: TBL Attachments Docs"
         verbose_name_plural =verbose_name
+        db_table = 'tbl_application_attachments_docs'
     def __str__(self):
         return self.name
 

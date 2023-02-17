@@ -110,8 +110,7 @@ DATABASES = {
 #         'NAME': 'olams_new',
 #         'USER': 'root',
 #         'PASSWORD': '',
-#         # 'HOST': '192.168.50.145',
-#         'HOST': 'localhost',
+#          'HOST': 'localhost',
 #         'PORT': '3306',
 #     }
     #  'default': {
