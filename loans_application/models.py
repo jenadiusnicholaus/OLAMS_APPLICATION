@@ -29,6 +29,7 @@ class  TBL_App_NECTADetails(models.Model):
         verbose_name = '1.0: TBL App Applicants NECTA User Details'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_necta_details'
 
     def __str__(self):
         return self.first_name
@@ -54,6 +55,7 @@ class  TBL_App_NoneNECTADetails(models.Model):
         verbose_name = '1.1: TBL App Applicants None NECTA User Details'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_non_necta_details'
 
     def __str__(self):
         return str(self.index_no)
@@ -106,6 +108,7 @@ class TBL_App_ApplicantType(models.Model):
         verbose_name = '2: TBL App ApplicantType'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_type'
 
 
     def __str__(self):
@@ -137,6 +140,7 @@ class TBL_App_ApplicantDetails(models.Model):
         verbose_name = '3: TBL App Applicant Details'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_applicants_details'
         
     def __str__(self):
         if  self.applicant_type:  
@@ -169,6 +173,7 @@ class TBL_App_Categories(models.Model):
         verbose_name = "4: TBL App  Applicants Categories"
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_applicant_category'
 
     def __str__(self):
         return self.name
@@ -185,6 +190,7 @@ class TBL_App_Applicant(models.Model):
         verbose_name = '5: TBL Applicant Conso Tbl'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_applicants'
 
     def __str__(self):
         if self.applicant_details is not None and self.applicant_details.applicant_type.none_necta is None:
@@ -213,6 +219,7 @@ class TBL_App_PaymentDetails(models.Model):
         verbose_name = "6: TBL App Payment Details"
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_payment_details'
 
     def __str__(self):
         if self.applicant:
@@ -254,6 +261,7 @@ class TBL_App_Profile(models.Model):
     class Meta:
         verbose_name = "7: Applicant Profile"
         verbose_name_plural = verbose_name
+        db_table = 'tbl_applicant_profile'
 
     def __str__(self):
         if self.user:

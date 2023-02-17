@@ -43,6 +43,7 @@ class TBL_GuarantorDetailsLUG(models.Model):
         verbose_name = '1: Guarant details LUG'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_guarantor_details'
 
     def __str__(self):
         if self.sur_name:
@@ -75,6 +76,7 @@ class TBL_GuarantorDetailsPGD(models.Model):
     class Meta:
         verbose_name = "2: Tbl Guarantor details PGD"
         verbose_name_plural = verbose_name
+        db_table = 'tbl_application_demographics_details_PGD'
 
     def __str__(self):
         return self.user.first_name
