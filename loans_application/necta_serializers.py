@@ -1,9 +1,8 @@
 
 from rest_framework import  serializers
 
-from loans_application.none_serializers import NoneNectaApplicantSerializer
+from loans_application.none_necta_serializers import NoneNectaApplicantSerializer
 from .models import *
-from education_info.models import TBL_Education_ApplicantAttendedSchool
 
 class NectaApplicantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +41,26 @@ class PaymentSerializer(serializers.ModelSerializer):
         class Meta:
             model = TBL_App_PaymentDetails
             fields = "__all__"
+
+class UserSerialiozer(serializers.ModelSerializer):
+        
+        class Meta:
+            model = User
+            fields = "__all__"
+
+
+
+class UserProfileSerialiozer(serializers.ModelSerializer):
+        applicant = ApplicantSerializer()
+        user = UserSerialiozer()
+
+        class Meta:
+            model = TBL_App_Profile
+            fields = "__all__"
+
+            
+
+
       
 
 

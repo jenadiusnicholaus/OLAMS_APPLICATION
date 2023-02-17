@@ -1,7 +1,7 @@
 
 from .models import *
 from rest_framework import serializers 
-from loans_application.none_serializers import *
+from loans_application.none_necta_serializers import *
 from loans_application.necta_serializers import *
 
 class ApplicantSchoolInformationSerializer(serializers.ModelSerializer):

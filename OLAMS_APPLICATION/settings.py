@@ -45,12 +45,12 @@ INSTALLED_APPS = [
     "guarantordetails",
     "preliminary_info",
     "attachments",
-    "corsheaders",
+    'usercategory',
     
-
     # Third part apps
     "phone_field",
-    "phonenumber_field"
+    "phonenumber_field",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -117,6 +117,10 @@ DATABASES = {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
+#      'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 }
 
 

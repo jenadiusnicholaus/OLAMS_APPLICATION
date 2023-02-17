@@ -164,7 +164,7 @@ def create_or_update_applicant_details(sender, instance, created, **kwargs):
     
         
 class TBL_App_Categories(models.Model):
-    id = models.AutoField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20, null = True,blank=True)
     description = models.TextField( null = True, blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -263,6 +263,7 @@ class TBL_App_Profile(models.Model):
         verbose_name_plural = verbose_name
         db_table = 'tbl_applicant_profile'
 
+
     def __str__(self):
         if self.user:
             return self.user.username
@@ -279,16 +280,6 @@ def create_or_update_applicant_inst_profile(sender, instance, created, **kwargs)
         try:
             TBL_App_Profile.objects.update_or_create(
                 applicant = instance)
-        except Exception as ex:
-            raise ex
-        
-# update user profile table whe the user is created
-@receiver(post_save, sender=User)
-def create_or_update_applicant_profile_user_inst(sender, instance, created, **kwargs):
-    if created:
-        try:
-            TBL_App_Profile.objects.update_or_create(
-                user = instance)
         except Exception as ex:
             raise ex
         

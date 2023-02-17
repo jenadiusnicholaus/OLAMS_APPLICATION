@@ -35,7 +35,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
     id = models.AutoField(primary_key=True)
     necta_applicants = models.ManyToManyField(TBL_App_NECTADetails)
     center_number = models.CharField(max_length=10, null=True,  blank=True, unique=True)
-    center_name = models.CharField(max_length=10, null=True,  blank=True)
+    center_name = models.CharField(max_length=100, null=True,  blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -143,7 +143,7 @@ class TblCourses(models.Model):
 class TBL_Education_TertiaryEducationInfos(models.Model):
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, null=True, related_name="ed_te_info_tbl_app_applicant")
-    admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False)
+    admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False, )
     admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING)
     admittedDegreeCategory = models.CharField(null=False, default="Master", max_length=15)
     applicationYear = models.IntegerField(null=False, default="2023")

@@ -29,7 +29,7 @@ class CallExternalApi:
             'Content-Type': 'application/json'
         }
         response = requests.request(
-            Api.Methods.POST, url, headers=headers, data=payload)
+            Api.Methods.POST, url, headers=headers, data=payload, timeout=5)
 
         json_data = json.loads(response.text)
 
@@ -38,7 +38,7 @@ class CallExternalApi:
     @staticmethod
     def applicant_loan_status(index_no):
         url = f"{ Api.URLS.BENFICIARY_OR_25_PERCENT_BASE_URL}?indexNo={index_no}"
-        response = requests.request(Api.Methods.GET, url)
+        response = requests.request(Api.Methods.GET, url, timeout=5)
         return response
 
     @staticmethod
@@ -88,7 +88,7 @@ class CallExternalApi:
     @staticmethod
     def check_control_number_status(billId):
         url = Api.URLS.CHECK_CONTROL_NUMBER_STATUS_BASE_URL+f"Id={billId}"
-        response = requests.request(Api.Methods.GET, url,)
+        response = requests.request(Api.Methods.GET, url, timeout=5)
         if response.status_code == 200:
             return json.loads(response.text)
         return json.loads(response.text)
@@ -98,6 +98,6 @@ class CallExternalApi:
 
         url = f"{Api.URLS.CONTROL_NUMBER_INFOS_BASE_URL}?controlNo={control_numner}"
 
-        response = requests.request(Api.Methods.GET, url)
+        response = requests.request(Api.Methods.GET, url, timeout=5)
 
         return response
