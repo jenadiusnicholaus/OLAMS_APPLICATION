@@ -5,7 +5,7 @@ from loans_application.models import *
 
 
 class TBL_Demo_DemocileDetails(models.Model):
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="demo_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.DO_NOTHING, null = True,related_name="demo_tbl_app_applicant")
     dob = models.DateField( null=True)
     region = models.ForeignKey('TBL_Demo_Region', on_delete= models.DO_NOTHING, null = True, related_name="demo_tbl_demo_region")
     distric = models.ForeignKey('TBL_Demo_District', on_delete=models.DO_NOTHING, null=True)

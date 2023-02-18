@@ -10,7 +10,7 @@ class TBL_attachments(models.Model):
     ('',""),
     ('',""),
     )
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete= models.DO_NOTHING, null = True,related_name="attachment_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.DO_NOTHING, null = True,related_name="attachment_tbl_app_applicant")
 
     cycle = models.CharField(max_length = 30, null = True)
     docid = models.ForeignKey("TBL_AttachemetsDocs", on_delete=models.DO_NOTHING, related_name="attachement_doc")
