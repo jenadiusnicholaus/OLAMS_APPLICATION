@@ -6,5 +6,5 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-   
+    path('applicantDemographicsDetails/',ApplicantDemographicsDetails.as_view()),
 ]

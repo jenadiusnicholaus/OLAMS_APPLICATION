@@ -21,8 +21,8 @@ class TBL_GuarantorDetailsLUG(models.Model):
     sur_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, null = True)
     sex = models.CharField(max_length=10, null =True, choices=SEX)
-    region = models.ForeignKey(TBL_Demo_Region, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_region_lug")
-    district = models.ForeignKey(TBL_Demo_Region, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_district")
+    region = models.ForeignKey(TblRegions, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_region_lug")
+    district = models.ForeignKey(TblRegions, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_district")
     postaladdress = models.CharField(max_length=10, null =True)
     mobile = PhoneNumberField(blank=True, null = True)
     email = models.CharField(max_length=10, null =True)
@@ -60,9 +60,9 @@ class TBL_GuarantorDetailsPGD(models.Model):
 
     # need some explaination
     inst = models.CharField(max_length=20, null=True)
-    region = models.ForeignKey(TBL_Demo_Region, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_region_pgd")
-    
-    district = models.ForeignKey(TBL_Demo_District, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_district_pgd")
+    region = models.ForeignKey(TblRegions, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_region_pgd")
+
+    district = models.ForeignKey(TblDistrict, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_district_pgd")
      
     contactperson = models.CharField(max_length=20, null= True)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -77,7 +77,7 @@ class TBL_GuarantorDetailsPGD(models.Model):
     class Meta:
         verbose_name = "2: Tbl Guarantor details PGD"
         verbose_name_plural = verbose_name
-        db_table = 'tbl_application_demographics_details_PGD'
+        db_table = 'tbl_application_guarantor_details_PGD'
 
     def __str__(self):
         return self.user.first_name
