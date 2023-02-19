@@ -4,14 +4,14 @@ from django.utils import timezone
 from loans_application.models import *
 
 
-class TBL_Demo_DemocileDetails(models.Model):
+class TblDemographicsDetails(models.Model):
     applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.DO_NOTHING, null = True,related_name="demo_tbl_app_applicant")
     dob = models.DateField( null=True)
-    region = models.ForeignKey('TBL_Demo_Region', on_delete= models.DO_NOTHING, null = True, related_name="demo_tbl_demo_region")
-    distric = models.ForeignKey('TBL_Demo_District', on_delete=models.DO_NOTHING, null=True)
+    region = models.ForeignKey('TblRegions', on_delete= models.DO_NOTHING, null = True, related_name="demo_tbl_demo_region")
+    distric = models.ForeignKey('TblDistrict', on_delete=models.DO_NOTHING, null=True)
     disability = models.BooleanField(default=False)
-    dom_region = models.ForeignKey("TBL_Demo_Region", on_delete=models.DO_NOTHING, related_name='demo_domestic_region', null=True)
-    dom_distric = models.ForeignKey("TBL_Demo_District", on_delete=models.DO_NOTHING, related_name='demo_domestic_distric', null=True)
+    dom_region = models.ForeignKey("TblRegions", on_delete=models.DO_NOTHING, related_name='demo_domestic_region', null=True)
+    dom_distric = models.ForeignKey("TblDistrict", on_delete=models.DO_NOTHING, related_name='demo_domestic_distric', null=True)
     dom_postal  = models.CharField(max_length=50, null = True)
     dom_ward = models.CharField(max_length=50, null = True)
     birth_cert_no = models.CharField(max_length=50, null = True)
@@ -19,7 +19,7 @@ class TBL_Demo_DemocileDetails(models.Model):
     nationalIdNo = models.CharField(max_length=50, null = True)
     birthplace = models.CharField(max_length=50, null = True)
     dom_village = models.CharField(max_length=30 , null= True)
-
+    app_year = models.CharField(max_length=4, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     confirm = models.BooleanField(default=False)
@@ -32,10 +32,10 @@ class TBL_Demo_DemocileDetails(models.Model):
 
 
     def __str__(self):
-        
+
         return self.name
 
-class TBL_Demo_Region(models.Model):
+class TblRegions(models.Model):
     region_id = models.IntegerField(null=False, blank=False, primary_key=True,default=111)
     region_name = models.CharField(null=True, blank=False, unique=True, max_length=100)
     created_date = models.DateTimeField(default=timezone.now)
@@ -52,8 +52,8 @@ class TBL_Demo_Region(models.Model):
         
         return f'{self.region_name}'
 
-class TBL_Demo_District(models.Model):
-    region = models.ForeignKey(TBL_Demo_Region, null=True, blank=False, on_delete=models.CASCADE)
+class TblDistrict(models.Model):
+    region = models.ForeignKey(TblRegions, null=True, blank=False, on_delete=models.CASCADE)
     district_name = models.CharField(max_length=100, null=True)
     created_date = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
