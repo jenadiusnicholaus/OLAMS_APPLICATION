@@ -2,10 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 from loans_application.models import *
-
+from  applicantProfile.models import *
 
 class TblDemographicsDetails(models.Model):
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.DO_NOTHING, null = True,related_name="demo_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.CASCADE, null = True,related_name="demo_tbl_app_applicant")
     dob = models.DateField( null=True)
     region = models.ForeignKey('TblRegions', on_delete= models.DO_NOTHING, null = True, related_name="demo_tbl_demo_region")
     distric = models.ForeignKey('TblDistrict', on_delete=models.DO_NOTHING, null=True)

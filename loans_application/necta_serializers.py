@@ -3,6 +3,7 @@ from rest_framework import  serializers
 
 from loans_application.none_necta_serializers import NoneNectaApplicantSerializer
 from .models import *
+from applicantProfile.models import *
 
 class NectaApplicantSerializer(serializers.ModelSerializer):
     class Meta:

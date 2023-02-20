@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "settings",
     "demographics",
     "education_info",
+    "applicantProfile",
     "guarantordetails",
     "preliminary_info",
     "attachments",

@@ -1,6 +1,6 @@
 import os
 from loans_application.models import *
-
+from applicantProfile.models import  *
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -10,14 +10,14 @@ class TBL_attachments(models.Model):
     ('',""),
     ('',""),
     )
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.DO_NOTHING, null = True,related_name="attachment_tbl_app_applicant")
+    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.CASCADE, null = True,related_name="attachment_tbl_app_applicant")
 
     cycle = models.CharField(max_length = 30, null = True)
     docid = models.ForeignKey("TBL_AttachemetsDocs", on_delete=models.DO_NOTHING, related_name="attachement_doc")
     status = models.CharField(max_length=50, null = True)
     verification = models.BooleanField(default=False)
     filename = models.CharField(max_length=100, null=True)
-    
+    app_year = models.CharField(max_length=4, null=True)
     verifiedby = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     
     verifieddate = models.DateTimeField(auto_created=False)

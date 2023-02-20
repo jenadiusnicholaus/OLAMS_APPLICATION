@@ -1,6 +1,7 @@
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 from loans_application.models import *
+from applicantProfile.models import *
 
 
 # Create your models here.
