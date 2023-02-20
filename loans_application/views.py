@@ -206,6 +206,7 @@ class SearchApplicantView(APIView):
                 #  but later after an application has completed, we provide the index_no for further reference
                 try:
                     _none_necta_applicant, none_necta_created = TBL_App_NoneNECTADetails.objects.get_or_create(
+                    app_year = app_year,
                     original_no = _index_no)
                 except  TBL_App_NoneNECTADetails.DoesNotExist:
                     return 
@@ -234,7 +235,6 @@ class SearchApplicantView(APIView):
                                         'status_code':status.HTTP_500_INTERNAL_SERVER_ERROR,
                                         "message": "An error occurred while making the network request: {}".format(str(e)),
                                         
-
                                     }
                             return Response(response_obj)
 
@@ -350,7 +350,9 @@ class ApplicantExistenceView(APIView):
             if _applicant_category == Constants.necta:
                
                 _necta_applicant = TBL_App_Applicant.objects.filter(
-                    applicant_details__applicant_type__necta__index_no=_index_no
+                    applicant_details__applicant_type__necta__index_no = _index_no,
+                    app_year = _app_year
+                    
                 )
 
                 if _necta_applicant.exists():
@@ -921,6 +923,7 @@ class ChooseApplicantCategory(APIView):
                             "success": True,
                             'status_code': status.HTTP_200_OK,
                             "message": 'The control Number provided should be used to make payments for your loan application',
+                            # Todo
                             "data": applicant_all_details_serializer.data
 
                         }
@@ -994,7 +997,7 @@ class ApplicationRegistration(APIView):
 
                 profileSerializer = UserProfileSerialiozer(instance = get_profile_object)
                
-                Helpers.updateUserCategory(applicant=_applicant, applicanttype= _applicant_type)
+                Helpers.update_or_create_beneficiary(user= user,applicant=_applicant, applicanttype= _applicant_type)
                 payment_serilizer = PaymentSerializer(instance=payment_information)
 
                 response_obj = {
@@ -1044,7 +1047,7 @@ class ApplicationRegistration(APIView):
 
                 profileSerializer = UserProfileSerialiozer(instance = get_profile_object)
                
-                Helpers.updateUserCategory(applicant=_applicant, applicanttype= _applicant_type)
+                Helpers.update_or_create_beneficiary(applicant=_applicant, applicanttype= _applicant_type, user=user)
 
                
                 payment_serilizer = PaymentSerializer(instance=payment_information)
@@ -1060,7 +1063,7 @@ class ApplicationRegistration(APIView):
 
                                 }
                 return Response(response_obj)
-                
+                nativeElement
 
         response_obj = {
             "success": False,

@@ -8,6 +8,7 @@ from api_service.external_api import CallExternalApi
 from education_info.models import *
 from education_info.serializers import *
 from usercategory.models import *
+from utils.rand_utils import RandUtils as rand_u
 
 
 class Helpers:
@@ -252,7 +253,7 @@ class Helpers:
                 applicant_school.necta_applicants.add(necta_applicant)
                 applicant_school.save()
 
-    def updateUserCategory(applicant, applicanttype):
+    def update_or_create_beneficiary(applicant, applicanttype, user):
         if applicanttype == Constants.necta:
             get_profile_object = TBL_App_Profile.objects.get(applicant__id = applicant.id)
             user_categery = BeneficiaryModel.objects.filter( index_no = get_profile_object.applicant.applicant_details.applicant_type.necta.index_no)
@@ -267,8 +268,9 @@ class Helpers:
                     mobile = get_profile_object.applicant.applicant_details.phonenumber,
                     is_loanee = False
                 )
+
             else:
-                 user_categery = BeneficiaryModel.objects.create( 
+                user_categery = BeneficiaryModel.objects.create( 
                     index_no = get_profile_object.applicant.applicant_details.applicant_type.necta.index_no,
                       first_name = get_profile_object.applicant.applicant_details.applicant_type.necta.first_name,
                     middle_name =get_profile_object.applicant.applicant_details.applicant_type.necta.middle_name,
@@ -278,10 +280,13 @@ class Helpers:
                     mobile = get_profile_object.applicant.applicant_details.phonenumber,
                     is_loanee = False
                      )
+                rand_u.upadateOrCreateUserCategory(user =user, benef_categiory=user_categery)
+
 
         else:
             get_profile_object = TBL_App_Profile.objects.get(applicant__id = applicant.id)
             user_categery = BeneficiaryModel.objects.filter( index_no = get_profile_object.applicant.applicant_details.applicant_type.none_necta.index_no)
+            user = User.objects. get()
             if user_categery.exists():
                 
                 user_categery.update(
@@ -293,8 +298,9 @@ class Helpers:
                     mobile = get_profile_object.applicant.applicant_details.phonenumber,
                     is_loanee = False
                 )
+                
             else:
-                 user_categery = BeneficiaryModel.objects.create( 
+                user_categery = BeneficiaryModel.objects.create( 
                     index_no = get_profile_object.applicant.applicant_details.applicant_type.none_necta.index_no,
                       first_name = get_profile_object.applicant.applicant_details.applicant_type.none_necta.first_name,
                     middle_name =get_profile_object.applicant.applicant_details.applicant_type.none_necta.middle_name,
@@ -304,6 +310,8 @@ class Helpers:
                     mobile = get_profile_object.applicant.applicant_details.phonenumber,
                     is_loanee = False
                      )
+                rand_u.upadate_or_create_user_category(user =user, benef_categiory=user_categery)
+                 
             
                     
                 

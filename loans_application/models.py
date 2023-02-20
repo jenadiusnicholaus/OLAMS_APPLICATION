@@ -239,7 +239,7 @@ class TBL_App_PaymentDetails(models.Model):
             self.used_by = self.applicant.applicant_details.applicant_type.necta.index_no
             return super(TBL_App_PaymentDetails, self,).save(*args, **kwargs) 
         elif self.applicant.applicant_details.applicant_type.none_necta:
-            self.used_by = self.applicant.applicant_details.applicant_type.none_necta.original_no
+            self.used_by = self.applicant.applicant_details.applicant_type.none_necta.index_no
             return super(TBL_App_PaymentDetails, self,).save(*args, **kwargs) 
             
         
