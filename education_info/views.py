@@ -39,4 +39,21 @@ class CheckSchoolExistence(APIView):
                         
                         }
         return Response(response_obj)
+class ApplicantEducationInformation(APIView):
+    authentication_classes = []
+    permission_classes = []
+    def post(self, request, *args, **kwargs):
+        _applicant = request.data['']
+        _f4_no_of_seat =
+        _pst4ed =
+        _f4sps =
+        _f4sps_cp =
+        _f4sps_cp_phone =
+        _f4sps_cp_addr =
+        _pst4sps =
+        _pst4sps_cp =
+        _pst4sps_cp_phone =
+        _pst4sps_cp_addr =
+        _ay =
+        _confirm = 0
                 
