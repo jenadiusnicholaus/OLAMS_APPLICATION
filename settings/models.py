@@ -29,29 +29,28 @@ class UserApplicationStateManager(models.Model):
         ( 6, "PRELIMINARY_INFO",),
         ( 7, "EDUCATION_INFO",), 
         ( 8, "GUARANTOR_INFO",), 
-
         )
+    
     MENU_STATE = (
 
         ( 'DONE', "DONE",), 
         ( 'IN_PROGRESS', "IN PROGRESS",),
-        ( 'nOT_STARTED', "NOT STARTED",),
+        ( 'NOT_STARTED', "NOT STARTED",),
       
     )
     
     
     menu_id =  models.IntegerField(null = True )
-    proocess_name = models.IntegerField(choices=APPLICATION_FORM_FILLING_STATUS)
-    menu_state =  models.CharField(choices=MENU_STATE, max_length= 200)
+    process_name = models.IntegerField(choices = APPLICATION_FORM_FILLING_STATUS)
+    menu_state =  models.CharField(choices=MENU_STATE, max_length = 20)
 
     class Metan:
         verbose_name = '2: Application state'
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return  self.proocess_name
+        return  str(self.process_name)
 
 
-    
 
     

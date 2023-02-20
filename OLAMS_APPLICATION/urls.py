@@ -28,6 +28,8 @@ urlpatterns = [
     path('api/application/', include('loans_application.urls')),
     path('api/education-info/', include('education_info.urls')),
     path('api/demographics/', include('demographics.urls')),
+     path('api/applicant_profile/', include('applicantProfile.urls')),
+
 
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

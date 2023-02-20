@@ -9,8 +9,6 @@ USER_CATEGORIES_CHOICES = (
     
 )
 
-
-
 class BeneficiaryModel(models.Model):
     loanee_id = models.BigIntegerField(null=True, blank=True, unique=True)
     index_no = models.CharField(null=False, blank=False, primary_key=True, max_length=50, unique=True)

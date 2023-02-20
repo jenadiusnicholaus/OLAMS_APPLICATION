@@ -81,6 +81,8 @@ class Helpers:
         _used_by  = None
         _used_when = None
         _used_status = None
+        # update app year in the for tjhe application year
+        _app_year = app_year
         _used_status = 0
         _updatedAt = timezone.now()
         if applicant_type == Constants.necta:
