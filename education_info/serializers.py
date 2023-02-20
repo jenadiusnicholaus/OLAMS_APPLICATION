@@ -30,3 +30,8 @@ class TertiaryEducationSerializer(serializers.ModelSerializer):
         model = TBL_Education_TertiaryEducationInfos
         fields = "__all__"
 
+class ConfirmEducationInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TBL_EducationInfo
+        fields = ('confirm'),
+

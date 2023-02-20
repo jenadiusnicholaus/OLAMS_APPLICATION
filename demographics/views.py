@@ -68,7 +68,7 @@ class ApplicantDemographicsDetails(APIView):
         _userprofile = request.data['userProfileId']
         _app_year = request.data['applicationYear']
         _confirm = 0
-        getDemographics = TblDemographicsDetails.objects.filter(app_year=_app_year, applicant=_userprofile).first()
+        getDemographics = TblDemographicsDetails.objects.filter(app_year=_app_year, applicant=_userprofile,confirm=_confirm).first()
         demographicSerializer = TblDemographicDetailsSerializer(getDemographics,data=request.data)
         if demographicSerializer.is_valid():
             demographicSerializer.save()
