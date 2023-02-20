@@ -133,6 +133,7 @@ class TBL_App_ApplicantDetails(models.Model):
     applicant_type = models.ForeignKey(TBL_App_ApplicantType, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='tbl_app_initial_applicant_type')
     phonenumber = models.CharField(max_length= 15, null= False, blank=False)
     email = models.EmailField(max_length= 30,null = True, blank=True)
+    appYear = models.CharField(max_length=4, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
  
@@ -183,6 +184,7 @@ class TBL_App_Applicant(models.Model):
     id = models.AutoField(primary_key=True)
     applicant_details = models.ForeignKey(TBL_App_ApplicantDetails,  on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_details')
     application_category = models.ForeignKey(TBL_App_Categories, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_category' )
+    app_year = models.CharField(max_length=4, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
    
@@ -211,6 +213,7 @@ class TBL_App_PaymentDetails(models.Model):
     used_by = models.CharField(max_length=16, null=True, blank=True)
     used_when = models.DateTimeField(max_length=16, null=True, blank=True )
     used_status = models.IntegerField(choices = USED_STATUS, default=0, null= True, blank=True )
+    app_year = models.CharField(max_length=4, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -249,40 +252,8 @@ def create_or_update_applicant_details(sender, instance, created, **kwargs):
         except Exception as ex:
             raise
     
-        
-class TBL_App_Profile(models.Model):
-    id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_profile_set', null=True)
-    user = models.OneToOneField(User,on_delete= models.DO_NOTHING, related_name= 'user_profile_set', null=True)
-    secret_question = models.CharField(max_length = 100, null = True, blank=True )
-    secret_answer = models.CharField(max_length = 100, null = True, blank=True )
-    confirmed = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = "7: Applicant Profile"
-        verbose_name_plural = verbose_name
-        db_table = 'tbl_applicant_profile'
 
 
-    def __str__(self):
-        if self.user:
-            return self.user.username
-        elif self.applicant.applicant_details.applicant_type.necta:
-            return self.applicant.applicant_details.applicant_type.necta.first_name
-        elif self.applicant.applicant_details.applicant_type.none_necta:
-            return self.applicant.applicant_details.applicant_type.none_necta.first_name
-        
-
-# updated user profile when applicant is created
-@receiver(post_save, sender=TBL_App_Applicant)
-def create_or_update_applicant_inst_profile(sender, instance, created, **kwargs):
-    if created:
-        try:
-            TBL_App_Profile.objects.update_or_create(
-                applicant = instance)
-        except Exception as ex:
-            raise ex
-        
 
     
     
