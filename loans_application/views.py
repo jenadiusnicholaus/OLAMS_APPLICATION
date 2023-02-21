@@ -1003,7 +1003,7 @@ class ApplicationRegistration(APIView):
                     applicant_details__applicant_type__necta__index_no=_index_no,
                 )
 
-                applicant_profile = TBL_App_Profile.objects.filter(
+                applicant_profile = TblAppProfile.objects.filter(
                     applicant__id=_applicant.id
 
                 ).update(
@@ -1012,7 +1012,7 @@ class ApplicationRegistration(APIView):
                     user=user,
                     confirmed=True
                 )
-                get_profile_object = TBL_App_Profile.objects.get(
+                get_profile_object = TblAppProfile.objects.get(
                     applicant__id=_applicant.id)
 
                 profileSerializer = UserProfileSerialiozer(
@@ -1057,7 +1057,7 @@ class ApplicationRegistration(APIView):
                     appYear = Constants.current_year
                 ).first()
 
-                TBL_App_Profile.objects.filter(
+                TblAppProfile.objects.filter(
                     applicant__id=_applicant.id
 
                 ).update(
@@ -1067,7 +1067,7 @@ class ApplicationRegistration(APIView):
                     confirmed=True
                 )
 
-                get_profile_object = TBL_App_Profile.objects.get(
+                get_profile_object = TblAppProfile.objects.get(
                     applicant__id=_applicant.id)
 
                 profileSerializer = UserProfileSerialiozer(

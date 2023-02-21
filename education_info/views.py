@@ -43,7 +43,8 @@ class ApplicantEducationInformation(APIView):
     authentication_classes = []
     permission_classes = []
     def post(self, request, *args, **kwargs):
-        _applicant = request.data['f4indexno']
+
+        _profileId = request.data['profileId']
         _f4_no_of_seat =request.data['noOfSeat']
         _pst4ed =request.data['postFormFour']
         _f4sps = request.data['formFourSponsorship']
@@ -56,17 +57,18 @@ class ApplicantEducationInformation(APIView):
         _pst4sps_cp_addr = request.data['postFormFourSponsorAddress']
         _ay = request.data['applicationYear']
         _confirm = False
-        educationInfo = TBL_EducationInfo.objects.filter(applicant=_applicant,ay=_ay)
+        applicantprofile = TblAppProfile.objects.get(id=_profileId)
+        educationInfo = TBL_EducationInfo.objects.filter(applicant=applicantprofile,ay=_ay)
         if educationInfo.exists():
             response_obj = {
-                "success": True,
+                "success": False,
                 'status_code': status.HTTP_200_OK,
                 "message": "Education Information Exists",
             }
             return Response(response_obj)
         else:
             created = TBL_EducationInfo.objects.create(
-                applicant = _applicant,
+                applicant =applicantprofile,
                 f4_no_of_seat = _f4_no_of_seat,
                 pst4ed = _pst4ed,
                 f4sps = _f4sps,
@@ -89,20 +91,20 @@ class ApplicantEducationInformation(APIView):
                 return Response(response_obj)
             else:
                 response_obj = {
-                    "success": True,
+                    "success": False,
                     'status_code': status.HTTP_200_OK,
                     "message": "There is an error please try again",
                 }
                 return Response(response_obj)
     def get(self,request, *args,**kwargs):
-        print(request.data)
-        _applicant = request.data['f4indexno']
+        _profileId = request.data['profileId']
         _ay = request.data['applicationYear']
-        educationInformation = TBL_EducationInfo.objects.filter(applicant=_applicant, ay=_ay).first()
+        #applicantprofile = TBL_App_Profile.objects.get(id=_profileId)
+        educationInformation = TBL_EducationInfo.objects.get(applicant=_profileId, ay=_ay)
         educationInfoserializer = EducationInfoSerializer(instance=educationInformation)
         if educationInfoserializer is None:
             response_obj = {
-                "success": True,
+                "success": False,
                 'status_code': status.HTTP_200_OK,
                 "message": "You did not fill any education information for thia application year",
             }
@@ -115,20 +117,61 @@ class ApplicantEducationInformation(APIView):
                 "data": educationInfoserializer.data
             }
             return Response(response_obj)
+
     def put(self, request,*args, **kwargs):
-        _applicant = request.data['f4indexno']
         _ay = request.data['applicationYear']
-        _confirm =False
-        informationForEdit = TBL_EducationInfo.objects.filter(applicant=_applicant,ay=_ay, confirm=_confirm).first()
-        educationInforSerializer = EducationInfoSerializer(informationForEdit, data=request.data, partial=True)
-        if educationInforSerializer.is_valid():
-            educationInforSerializer.save()
-            response_obj ={
-                "success": True,
+        _profileId = request.data['profileId']
+        _f4_no_of_seat = request.data['noOfSeat']
+        _pst4ed = request.data['postFormFour']
+        _f4sps = request.data['formFourSponsorship']
+        _f4sps_cp = request.data['formFourSponsorContactPerson']
+        _f4sps_cp_phone = request.data['formFourSponsorPhoneNo']
+        _f4sps_cp_addr = request.data['formFourSponsorAddress']
+        _pst4sps = request.data['postFormFourSponsorship']
+        _pst4sps_cp = request.data['postFormFourContactPerson']
+        _pst4sps_cp_phone = request.data['postFormFourSponsorPhoneNo']
+        _pst4sps_cp_addr = request.data['postFormFourSponsorAddress']
+        _confirm =0
+        #applicantprofile = TblAppProfile.objects.get(id=_applicant)
+        informationForEdit = TBL_EducationInfo.objects.filter(applicant=_profileId,ay=_ay,confirm=_confirm).first()
+        if informationForEdit is not None:
+            dataToEdit = {
+                'confirm': _confirm,
+                'f4_no_of_seat': _f4_no_of_seat,
+                'pst4ed': _pst4ed,
+                'f4sps': _f4sps,
+                'f4sps_cp': _f4sps_cp,
+                'f4sps_cp_phone': _f4sps_cp_phone,
+                'f4sps_cp_addr': _f4sps_cp_addr,
+                'pst4sps': _pst4sps,
+                'pst4sps_cp': _pst4sps_cp,
+                'pst4sps_cp_phone': _pst4sps_cp_phone,
+                'pst4sps_cp_addr': _pst4sps_cp_addr
+            }
+            educationInforSerializer = EducationInfoSerializer(informationForEdit, data=dataToEdit, partial=True)
+            if educationInforSerializer.is_valid():
+                educationInforSerializer.save()
+                response_obj ={
+                    "success": True,
+                    "status_code": status.HTTP_200_OK,
+                    "message": "Education information Updated Successfully"
+                }
+                return Response(response_obj)
+            else:
+                response_obj = {
+                    "success": False,
+                    "status_code": status.HTTP_200_OK,
+                    "message": "Education info Failed to Updated"
+                }
+                return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
                 "status_code": status.HTTP_200_OK,
-                "message": "Education information Updated Successfully"
+                "message": "Education info Not Found"
             }
             return Response(response_obj)
+
 class EducationConfirmation(APIView):
     authentication_classes = []
     permission_classes = []
@@ -162,4 +205,3 @@ class EducationConfirmation(APIView):
                 "message": "No matching education information found"
             }
             return Response(response_obj)
-

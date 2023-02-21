@@ -12,10 +12,10 @@ class Migration(migrations.Migration):
         ('loans_application', '0044_rename_secrete_answer_tbl_app_profile_secret_answer_and_more'),
     ]
 
-    operations = [
-        migrations.AlterField(
-            model_name='tbl_app_profile',
-            name='user',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='user_profile_set', to=settings.AUTH_USER_MODEL),
-        ),
-    ]
+    # operations = [
+    #     migrations.AlterField(
+    #         model_name='tbl_app_profile',
+    #         name='user',
+    #         field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='user_profile_set', to=settings.AUTH_USER_MODEL),
+    #     ),
+    # ]

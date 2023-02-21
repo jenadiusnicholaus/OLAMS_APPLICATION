@@ -18,7 +18,7 @@ class TBL_GuarantorDetailsLUG(models.Model):
             return os.path.join("GuarantorDetailsLUG", self.user.username, instance)
         return None
 
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.CASCADE, null = True,related_name="guarantor_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete= models.CASCADE, null = True, related_name="guarantor_tbl_app_applicant")
     sur_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, null = True)
     sex = models.CharField(max_length=10, null =True, choices=SEX)
@@ -53,7 +53,7 @@ class TBL_GuarantorDetailsLUG(models.Model):
 
 class TBL_GuarantorDetailsPGD(models.Model):
     id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.CASCADE, null = True,related_name="guarantor_PGD_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete= models.CASCADE, null = True, related_name="guarantor_PGD_tbl_app_applicant")
     postaladdress = models.CharField(max_length=100)
     telephone = PhoneNumberField(null=True)
 

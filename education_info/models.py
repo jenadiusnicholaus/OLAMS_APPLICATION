@@ -4,9 +4,10 @@ from django.db import models
 from loans_application.models import *
 from applicantProfile.models import *
 
+
 class TBL_EducationInfo(models.Model):
     id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete= models.CASCADE, null = True,related_name="ed_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete= models.CASCADE, null = True, related_name="ed_tbl_app_applicant")
     f4_no_of_seat = models.IntegerField(default=0)
     pst4ed = models.CharField(max_length=30, null=True)
     f4sps = models.CharField(max_length=30, null=True)
@@ -51,7 +52,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
 
 class TBL_Education_FormFourInfos(models.Model):
     id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete=models.CASCADE, null=True, related_name="ed_form4_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_form4_info_tbl_app_applicant")
     app_year = models.CharField(max_length=4, null=True)
     index_no = models.CharField(max_length=16)
     updated_at = models.DateTimeField(default=timezone.now)
@@ -71,7 +72,7 @@ class TBL_Education_FormFourInfos(models.Model):
 
 class TBL_Education_FormSixInfos(models.Model):
     id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete=models.CASCADE, null=True, related_name="ed_form6_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_form6_info_tbl_app_applicant")
     app_year = models.CharField(max_length=4, null=True)
     # add some more field here
     index_no = models.CharField(max_length=16)
@@ -90,7 +91,7 @@ class TBL_Education_FormSixInfos(models.Model):
 class TBL_Education_DiplomaInfos(models.Model):
     id = models.AutoField(primary_key=True)
     app_year = models.CharField(max_length=4, null=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete=models.CASCADE, null=True, related_name="ed_diploma_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_diploma_info_tbl_app_applicant")
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     # add some more field here
@@ -145,7 +146,7 @@ class TblCourses(models.Model):
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
     id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete=models.CASCADE, null=True, related_name="ed_te_info_tbl_app_applicant")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_te_info_tbl_app_applicant")
     admittedInstitute = models.ForeignKey(TBL_Education_institution, on_delete=models.DO_NOTHING, null=False, )
     admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING)
     admittedDegreeCategory = models.CharField(null=False, default="Master", max_length=15)

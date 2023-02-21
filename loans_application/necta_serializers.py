@@ -56,7 +56,7 @@ class UserProfileSerialiozer(serializers.ModelSerializer):
         user = UserSerialiozer()
 
         class Meta:
-            model = TBL_App_Profile
+            model = TblAppProfile
             fields = "__all__"
 
             

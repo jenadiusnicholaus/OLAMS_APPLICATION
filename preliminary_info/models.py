@@ -7,7 +7,7 @@ from applicantProfile.models import *
 # Create your models here.
 class TblPreliminaryInfo(models.Model):
     id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TBL_App_Profile, on_delete=models.DO_NOTHING, null=True,
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.DO_NOTHING, null=True,
                                   related_name="tbl_preliminary_applicant")
     applicantDisable = models.BooleanField()
     fatherAlive = models.BooleanField(default=1)
