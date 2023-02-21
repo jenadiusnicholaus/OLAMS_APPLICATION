@@ -13,3 +13,7 @@ class TblDemoDistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = TblDistrict
         fields = "__all__"
+class ConfirmDemographicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TblDemographicsDetails
+        fields ='confirm',

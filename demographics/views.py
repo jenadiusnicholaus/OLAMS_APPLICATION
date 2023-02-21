@@ -99,8 +99,8 @@ class ApplicantDemographicsDetails(APIView):
             'dom_village': _dom_village,
             'confirm':_confirm
         }
-        applicantprofile = TblAppProfile.objects.get(id=_userprofileId)
-        getDemographics = TblDemographicsDetails.objects.filter(app_year=_app_year, applicant=applicantprofile,confirm=_confirm).first()
+        #applicantprofile = TblAppProfile.objects.get(id=_userprofileId)
+        getDemographics = TblDemographicsDetails.objects.filter(app_year=_app_year, applicant=_userprofileId,confirm=_confirm).first()
         demographicSerializer = TblDemographicDetailsSerializer(getDemographics,data=dataToEdit, partial=True)
         if demographicSerializer.is_valid():
             demographicSerializer.save()
@@ -115,5 +115,38 @@ class ApplicantDemographicsDetails(APIView):
                 "success": True,
                 'status_code': status.HTTP_200_OK,
                 "message": "Demographics Information Not Updated",
+            }
+            return Response(response_obj)
+class ConfirmDemographics(APIView):
+    authentication_classes = []
+    permission_classes = []
+    def put(self, request, *args, **kwargs):
+        _userprofileId = request.data['userProfileId']
+        _app_year = request.data['applicationYear']
+        _confirm = 0
+        _confirmed=1
+        dataToConfirm = TblAppProfile.objects.filter(app_year=_app_year, applicant=_userprofileId,confirm=_confirm).first()
+        if dataToConfirm is not None:
+            confirmDemographicSerializer = ConfirmDemographicSerializer(dataToConfirm, data={'confirm':_confirmed}, partial=True)
+            if confirmDemographicSerializer.is_valid():
+                confirmDemographicSerializer.save()
+                response_obj ={
+                    "success": True,
+                    "status_code": status.HTTP_200_OK,
+                    "message": "Demographics Information Confirmed",
+                }
+                return  Response(response_obj)
+            else:
+                response_obj = {
+                    "success": False,
+                    "status_code": status.HTTP_200_OK,
+                    "message": "Invalid Input, Please try again",
+                }
+                return  Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                "status_code": status.HTTP_200_OK,
+                "message": "Your demographics Info not found for this year",
             }
             return Response(response_obj)

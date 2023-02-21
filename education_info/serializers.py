@@ -34,13 +34,4 @@ class ConfirmEducationInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = TBL_EducationInfo
         fields = 'confirm',
-# class UpdateEducationInfoSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TBL_EducationInfo
-#         fields = (
-#             'confirm','f4_no_of_seat', 'pst4ed','f4sps', 'f4sps_cp', 'f4sps_cp_phone', 'f4sps_cp_addr', 'pst4sps',
-#             'pst4sps_cp',
-#             'pst4sps_cp_phone',
-#             'pst4sps_cp_addr'
-#         ),
 
