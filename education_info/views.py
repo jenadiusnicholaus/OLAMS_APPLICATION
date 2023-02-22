@@ -751,7 +751,7 @@ class MasterDegreeAwardView(APIView):  ###### MASTER DEGREE AWARD DETAILS FOR PG
                 "message": "Master degree info Not Found"
             }
             return Response(response_obj)
-class EducationConfirmation(APIView):
+class EducationConfirmation(APIView): ########### CONFIRM EDUCATION INFORMATION ################
     authentication_classes = []
     permission_classes = []
     def put(self, request, *args,**kwargs):
@@ -782,5 +782,38 @@ class EducationConfirmation(APIView):
                 "success": False,
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "message": "No matching education information found"
+            }
+            return Response(response_obj)
+class TertiaryEducationConfirmation(APIView):
+    authentication_classes = []
+    permission_classes = []
+    def put(self, request, *args,**kwargs):
+        _applicant = request.data['profileId']
+        _applicationYear = request.data['applicationYear']
+        _confirm = 0
+        _confirmed =1
+        dataToConfirm = TBL_Education_TertiaryEducationInfos.objects.filter(applicant=_applicant,applicationYear=_applicationYear,confirm=_confirm).first()
+        if dataToConfirm is not None:
+            confirmSerializer = ConfirmTertiaryEducationSerializer(dataToConfirm, data={'confirm': _confirmed}, partial=True)
+            if confirmSerializer.is_valid():
+                confirmSerializer.save()
+                response_obj = {
+                    "success": True,
+                    "status_code": status.HTTP_200_OK,
+                    "message": " Tertiary Education information Confirmed Successfully"
+                }
+                return Response(response_obj)
+            else:
+                response_obj = {
+                    "success": True,
+                    "status_code": status.HTTP_200_OK,
+                    "message": "There is an error on Confirm Tertiary Education Information"
+                }
+                return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                "status_code": status.HTTP_404_NOT_FOUND,
+                "message": "No matching Tertiary education information found"
             }
             return Response(response_obj)

@@ -15,4 +15,5 @@ urlpatterns = [
     path('education-bachelorAwards/',TertiaryEducationBachelorAwardsView.as_view()),
     path('education-masterAwards/',MasterDegreeAwardView.as_view()),
     path('education-information/confirm/', EducationConfirmation.as_view()),
+    path('education-tertiaryInfo/confirm',TertiaryEducationConfirmation.as_view())
 ]

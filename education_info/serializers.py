@@ -42,4 +42,8 @@ class ConfirmEducationInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = TBL_EducationInfo
         fields = 'confirm',
+class ConfirmTertiaryEducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TBL_Education_TertiaryEducationInfos
+        fields ='confirm',
 

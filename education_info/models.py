@@ -174,6 +174,7 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
     admittedCourse = models.ForeignKey(TblCourses, null=False, on_delete=models.DO_NOTHING)
     admittedDegreeCategory = models.CharField(null=False, default="Master", max_length=15)
     applicationYear = models.IntegerField(null=False, default="2023")
+    confirm = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
