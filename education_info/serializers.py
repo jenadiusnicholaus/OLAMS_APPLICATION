@@ -23,11 +23,19 @@ class FormsixInformationSerializer(serializers.ModelSerializer):
         fields ="__all__"
 class DiplomaInformationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TBL_Education_DiplomaInfos
+        model = TblDiplomaDetails
         fields = "__all__"
 class TertiaryEducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TBL_Education_TertiaryEducationInfos
+        fields = "__all__"
+class BachelorDegreeAwardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TblTertiaryEducationBachelorAwards
+        fields ="__all__"
+class MasterDegreeAwardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =TblTertiaryEducationMasterAward
         fields = "__all__"
 
 class ConfirmEducationInfoSerializer(serializers.ModelSerializer):
