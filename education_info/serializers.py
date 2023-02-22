@@ -16,7 +16,7 @@ class EducationInfoSerializer(serializers.ModelSerializer):
 class FormfourInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model =TBL_Education_FormFourInfos
-        fields ="__all"
+        fields ="__all__"
 class FormsixInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TBL_Education_FormSixInfos

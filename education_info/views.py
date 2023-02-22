@@ -180,7 +180,7 @@ class FormFourDetailsView(APIView): #Other form four seating's Details
         _third_seat_index_no = request.data['otherFormFourIndexno2']
         applicantprofile = TblAppProfile.objects.get(id=_applicant)
         formFourDetails = TBL_Education_FormFourInfos.objects.filter(app_year=_app_year, applicant=_applicant).first()
-        if formFourDetails.exist():
+        if formFourDetails is not None:
             response_obj ={
                 "success": False,
                 "status_code": status.HTTP_200_OK,
@@ -210,9 +210,9 @@ class FormFourDetailsView(APIView): #Other form four seating's Details
             response_obj ={
                 "success": True,
                 "status": status.HTTP_200_OK,
-                "data": formFourDetails.data,
+                "data": formFourSerializer.data,
             }
-            return  response_obj
+            return  Response(response_obj)
         else:
             response_obj ={
                 "success": False,
@@ -295,7 +295,7 @@ class FormSixDetailsView(APIView): ######### FORM SIX DETAILS ##################
                 "status": status.HTTP_200_OK,
                 "data": formsixserializer.data,
             }
-            return response_obj
+            return Response(response_obj)
         else:
             response_obj = {
                 "success": False,
@@ -388,7 +388,7 @@ class DiplomaDetailsView(APIView):
                 "status": status.HTTP_200_OK,
                 "data": diplodetailserializer.data,
             }
-            return response_obj
+            return Response(response_obj)
         else:
             response_obj = {
                 "success": False,
@@ -489,7 +489,7 @@ class TertiaryEducationView(APIView):
                 "status": status.HTTP_200_OK,
                 "data": tertiaryInfoSerializer.data,
             }
-            return response_obj
+            return Response(response_obj)
         else:
             response_obj = {
                 "success": False,
@@ -591,7 +591,7 @@ class TertiaryEducationBachelorAwardsView(APIView): #############  BACHELOR DEGR
                 "status": status.HTTP_200_OK,
                 "data": bachelorawardserializer.data,
             }
-            return response_obj
+            return Response(response_obj)
         else:
             response_obj = {
                 "success": False,
@@ -698,7 +698,7 @@ class MasterDegreeAwardView(APIView):  ###### MASTER DEGREE AWARD DETAILS FOR PG
                 "status": status.HTTP_200_OK,
                 "data": masterrawardserializer.data,
             }
-            return response_obj
+            return Response(response_obj)
         else:
             response_obj = {
                 "success": False,
