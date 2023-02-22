@@ -3,7 +3,7 @@ from loans_application.models import *
 from django.utils import timezone
 # Create your models here.
 
-class TBL_App_Profile(models.Model):
+class TblAppProfile(models.Model):
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING, related_name='tbl_app_applicant_profile_set', null=True)
     user = models.OneToOneField(User,on_delete= models.DO_NOTHING, related_name= 'user_profile_set', null=True)
@@ -31,7 +31,7 @@ class TBL_App_Profile(models.Model):
 def create_or_update_applicant_inst_profile(sender, instance, created, **kwargs):
     if created:
         try:
-            TBL_App_Profile.objects.update_or_create(
+            TblAppProfile.objects.update_or_create(
                 applicant=instance)
         except Exception as ex:
             raise ex

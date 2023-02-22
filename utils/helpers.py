@@ -257,7 +257,7 @@ class Helpers:
 
     def update_or_create_beneficiary(applicant, applicanttype, user):
         if applicanttype == Constants.necta:
-            get_profile_object = TBL_App_Profile.objects.get(applicant__id = applicant.id)
+            get_profile_object = TblAppProfile.objects.get(applicant__id = applicant.id)
             user_categery = BeneficiaryModel.objects.filter( index_no = get_profile_object.applicant.applicant_details.applicant_type.necta.index_no)
             if user_categery.exists():
                 
@@ -286,7 +286,7 @@ class Helpers:
 
 
         else:
-            get_profile_object = TBL_App_Profile.objects.get(applicant__id = applicant.id)
+            get_profile_object = TblAppProfile.objects.get(applicant__id = applicant.id)
             user_categery = BeneficiaryModel.objects.filter( index_no = get_profile_object.applicant.applicant_details.applicant_type.none_necta.index_no)
             user = User.objects. get()
             if user_categery.exists():

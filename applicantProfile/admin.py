@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from applicantProfile.models import TBL_App_Profile
+from applicantProfile.models import TblAppProfile
 
 # Register your models here.
-admin.site.register(TBL_App_Profile)
+admin.site.register(TblAppProfile)
