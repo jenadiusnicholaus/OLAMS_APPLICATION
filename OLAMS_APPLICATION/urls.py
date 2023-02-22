@@ -4,19 +4,8 @@ from django.urls import path, include
 
 # from django.contrib.auth.models import User
 from django.urls import include, path
-
-
-# Serializers define the API representation.
-# class UserSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['url', 'username', 'email', 'is_staff']
-
-
-# ViewSets define the view behavior.
-# class UserViewSet(viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 # Routers provide a way of automatically determining the URL conf.
@@ -28,9 +17,8 @@ urlpatterns = [
     path('api/application/', include('loans_application.urls')),
     path('api/education-info/', include('education_info.urls')),
     path('api/demographics/', include('demographics.urls')),
-     path('api/applicant_profile/', include('applicantProfile.urls')),
+    path('api/applicant-profile/', include('applicantProfile.urls')),
 
 
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-]
-
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

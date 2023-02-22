@@ -7,13 +7,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('attachments', '0009_alter_tbl_attachments_applicant'),
         ('loans_application', '0050_delete_tbl_app_profile'),
-        ('demographics', '0004_alter_tbldemographicsdetails_applicant'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('education_info', '0001_initial'),
-        ('guarantordetails', '0004_alter_tbl_guarantordetailslug_applicant_and_more'),
-        ('preliminary_info', '0009_alter_tblpreliminaryinfo_applicant'),
         ('applicantProfile', '0001_initial'),
     ]
 
