@@ -32,8 +32,8 @@ class TblPreliminaryInfo(models.Model):
 
 class TblParentsInfo(models.Model):
     id = models.AutoField(primary_key=True)
-    preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
-                                    related_name="tbl_parent_preliminary")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.DO_NOTHING, null=True,
+                                  related_name="tbl_parent_info_applicant")
     firstName = models.CharField(max_length=40, null=False)
     middleName = models.CharField(max_length=40, null=False)
     lastName = models.CharField(max_length=40, null=False)
@@ -43,6 +43,7 @@ class TblParentsInfo(models.Model):
     mobileNumber = PhoneNumberField(null=False)
     gender = models.CharField(max_length=1, null=False)
     applicantRelationship = models.CharField(null=False, max_length=20)
+    appYear = models.CharField(max_length=4, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
     class Meta:
@@ -55,11 +56,12 @@ class TblParentsInfo(models.Model):
 
 class TblParentDeathInfo(models.Model):
     id = models.AutoField(primary_key=True)
-    preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
-                                    related_name="tbl_parentsDeathInfo_preliminary")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.DO_NOTHING, null=True,
+                                  related_name="tbl_parent_death_applicant")
     deathCertificateNo = models.CharField(max_length=40, null=False)
     deceasedName = models.CharField(null=False, max_length=60)
     applicantRelationship = models.CharField(null=False, max_length=20)
+    appYear = models.CharField(max_length=4, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -91,11 +93,12 @@ class TblDisability(models.Model):
 
 class TblDisabilityInfo(models.Model):
     id = models.AutoField(primary_key=True)
-    preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING, null=False,
-                                    related_name="tbl_disabilityInfo_preliminary")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.DO_NOTHING, null=True,
+                                  related_name="tbl_disability_info_applicant")
     disabilityType = models.ForeignKey(TblDisability, on_delete=models.DO_NOTHING, null=False,
                                        related_name="tbl_disabilityInfo_disability")
     disabledPerson = models.CharField(null=False, max_length=20)
+    appYear = models.CharField(max_length=4, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -108,14 +111,15 @@ class TblDisabilityInfo(models.Model):
 
 class TblTasafInfo(models.Model):
     id = models.AutoField(primary_key=True)
-    preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
-                                    related_name="tbl_tasaf_preliminary")
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.DO_NOTHING, null=True,
+                                  related_name="tbl_tasaf_info_applicant")
     firstName = models.CharField(null=False, max_length=40)
     middleName = models.CharField(null=False, max_length=40)
     lastName = models.CharField(null=False, max_length=40)
     dateOfBirth = models.DateField(null=False)
     registrationNo = models.CharField(null=False, max_length=30)
     memberLineNo = models.IntegerField(null=False)
+    appYear = models.CharField(max_length=4, null=True)
     gender = models.CharField(max_length=10, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
@@ -127,16 +131,16 @@ class TblTasafInfo(models.Model):
         return self.firstName + " "+ self.lastName + " " + self.registrationNo
 
 
-class TblOtherFormFourNumber(models.Model):
-    id = models.AutoField(primary_key=True)
-    preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
-                                    related_name="TblOtherForm4Number_preliminary")
-    otherFormFourIndexNo = models.CharField(max_length=16, null=False)
-    updated_at = models.DateTimeField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-    class Meta:
-        verbose_name = "tbl other Form four Numbers"
-        verbose_name_plural = verbose_name
-        db_table = 'tbl_other_form_four_index_numbers'
-    def __str__(self):
-        return self.otherFormFourIndexNo + " " + self.preliminary.appYear
+# class TblOtherFormFourNumber(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     preliminary = models.ForeignKey(TblPreliminaryInfo, on_delete=models.DO_NOTHING,
+#                                     related_name="TblOtherForm4Number_preliminary")
+#     otherFormFourIndexNo = models.CharField(max_length=16, null=False)
+#     updated_at = models.DateTimeField(default=timezone.now)
+#     created_at = models.DateTimeField(default=timezone.now)
+#     class Meta:
+#         verbose_name = "tbl other Form four Numbers"
+#         verbose_name_plural = verbose_name
+#         db_table = 'tbl_other_form_four_index_numbers'
+#     def __str__(self):
+#         return self.otherFormFourIndexNo + " " + self.preliminary.appYear
