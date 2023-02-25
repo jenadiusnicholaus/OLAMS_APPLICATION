@@ -48,7 +48,6 @@ class UploadApplicantPhotoView(viewsets.ModelViewSet):
             queryset = queryset.filter(
                 applicant_id=_applicant_id).first()
 
-
         # Paginate the results
         page = self.paginate_queryset(queryset)
         if page is not None:

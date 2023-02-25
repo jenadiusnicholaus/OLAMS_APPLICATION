@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 
 
-class TblApplicantProUploadImageSerializerfileSerializer(serializers.ModelSerializer):
+class TblApplicantProUploadImageSerializerfile(serializers.ModelSerializer):
     class Meta:
         model = TblAppProfile
         fields = "__all__"

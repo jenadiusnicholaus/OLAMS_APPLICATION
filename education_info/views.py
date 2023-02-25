@@ -816,4 +816,6 @@ class TertiaryEducationConfirmation(APIView):
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "message": "No matching Tertiary education information found"
             }
+            # Add some filtering based on query params
             return Response(response_obj)
+        _applicant_id = request.query_params.get('applicant_id', None)
