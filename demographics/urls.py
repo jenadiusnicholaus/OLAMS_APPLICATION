@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import *
 router = routers.DefaultRouter()
-router.register(r'regiion', DemographicRegionViewSet)
+router.register(r'region', DemographicRegionViewSet)
 router.register(r'district',  DemographicDistrictViewSet)
 
 

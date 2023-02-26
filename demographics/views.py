@@ -43,10 +43,10 @@ class ApplicantDemographicsDetails(APIView):
 
             _distric_obj = TblDistrict.objects.get(id=_distric)
 
-            _domestic_region_obj = TblRegions.objects.get(
-                region_id=_dom_region)
+            _domestic_region_obj = TblRegions.objects.get(region_id=_dom_region)
 
             _domestic_distric_obj = TblDistrict.objects.get(id=_dom_distric)
+
             iso_date_str = datetime.strptime(
                 _dob, '%Y-%m-%d').date().isoformat()
 
@@ -184,12 +184,12 @@ class ApplicantDemographicsDetails(APIView):
             'dom_village': _dom_village,
             'confirm': _confirm
         }
-        applicantprofile = TblAppProfile.objects.get(id=_userprofileId)
+        # applicantprofile = TblAppProfile.objects.get(id=_userprofileId)
         getDemographics = TblDemographicsDetails.objects.get(
-            app_year=_app_year, applicant=applicantprofile, confirm=_confirm)
+            app_year=_app_year, applicant__id=_userprofileId, confirm=_confirm)
         demographicSerializer = TblDemographicDetailsSerializer(
             getDemographics, data=dataToEdit, partial=True)
-        print(demographicSerializer.initial_data)
+      
 
         if demographicSerializer.is_valid():
             demographicSerializer.save()
