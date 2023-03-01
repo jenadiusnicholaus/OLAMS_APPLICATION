@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import viewsets, status
 from .serializers import *
 # Create your views here.
 class PreliminaryInfoView(viewsets.ModelViewSet):
+    authentication_classes = []
+    permission_classes = []
     queryset = TblPreliminaryInfo.objects.all()
     serializer_class = PreliminaryInforSerializer
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
 
     def create(self, request, *args, **kwargs):
         # Map user input fields to object fields
@@ -42,7 +44,7 @@ class PreliminaryInfoView(viewsets.ModelViewSet):
             }
             return Response(response_obj)
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
         # Map user input fields to object fields
@@ -64,4 +66,77 @@ class PreliminaryInfoView(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+class ParentInfoView(viewsets.ModelViewSet):
+    authentication_classes = []
+    permission_classes = []
+    queryset = TblParentsInfo.objects.all()
+    serializer_class = ParentInforSerializer
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    def create(self, request, *args, **kwargs):
+        # Map user input fields to object fields
+        # applicantprofile = TblAppProfile.objects.get(id=request.data['profileId'])
+        data = {
+            'applicant': request.data.get('profileId'),
+            'firstName': request.data.get('firstName'),
+            'middleName': request.data.get('middleName'),
+            'lastName': request.data.get('lastName'),
+            'occupation': request.data.get('ocupation'),
+            'postalAddress':request.data.get('postalAddress'),
+            'physicalAddress': request.data.get('physicalAddress'),
+            'mobileNumber': request.data.get('mobileNo'),
+            'gender': request.data.get('gender'),
+            'applicantRelationship': request.data.get('relationShip'),
+            'appYear': request.data.get('app_year'),
+        }
+        serializer = ParentInforSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Parent information Saved Successfully",
+            }
+            return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                "message": serializer.errors,
+            }
+            return Response(response_obj)
 
+    def update(self, request, *args, **kwargs):
+        applicant = request.data.get('profileId')
+        app_year = request.data.get('app_year')
+        instance = TblParentsInfo.objects.get(applicant=applicant, appYear=app_year)
+        print(request.method)
+        # Map user input fields to object fields
+        data = {
+            'applicant': request.data.get('profileId'),
+            'firstName': request.data.get('firstName'),
+            'middleName': request.data.get('middleName'),
+            'lastName': request.data.get('lastName'),
+            'occupation': request.data.get('ocupation'),
+            'postalAddress': request.data.get('postalAddress'),
+            'physicalAddress': request.data.get('physicalAddress'),
+            'mobileNumber': request.data.get('mobileNo'),
+            'gender': request.data.get('gender'),
+            'applicantRelationship': request.data.get('relationShip'),
+        }
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid:
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "parent information updated",
+            }
+            return Response(response_obj)
+        else:
+            response_obj ={
+                "success":False,
+                "status_code": status.HTTP_204_NO_CONTENT,
+                "message": "Parent information not available",
+            }
+            return Response(response_obj)
