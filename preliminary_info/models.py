@@ -98,7 +98,7 @@ class TblDisabilityInfo(models.Model):
     disabilityType = models.ForeignKey(TblDisability, on_delete=models.DO_NOTHING, null=False,
                                        related_name="tbl_disabilityInfo_disability")
     disabledPerson = models.CharField(null=False, max_length=20)
-    appYear = models.CharField(max_length=4, null=True)
+    app_year = models.CharField(max_length=4, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -119,7 +119,7 @@ class TblTasafInfo(models.Model):
     dateOfBirth = models.DateField(null=False)
     registrationNo = models.CharField(null=False, max_length=30)
     memberLineNo = models.IntegerField(null=False)
-    appYear = models.CharField(max_length=4, null=True)
+    app_year = models.CharField(max_length=4, null=True)
     gender = models.CharField(max_length=10, null=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)

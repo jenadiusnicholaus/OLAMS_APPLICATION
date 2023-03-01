@@ -5,11 +5,11 @@ from . models import *
 admin.site.register(TBL_EducationInfo)
 admin.site.register(TBL_Education_ApplicantAttendedSchool)
 admin.site.register(TBL_Education_FormFourInfos)
-admin.site.register(TBL_Education_FormSixInfos)
+admin.site.register(TBLEducationFormSixInfos)
 admin.site.register(TblDiplomaDetails)
 admin.site.register(TBL_Education_TertiaryEducationInfos)
 admin.site.register(TblDiplomaInstitutions)
-
-
-
-
+admin.site.register(Institutions)
+admin.site.register(TblPost4EductionType)
+admin.site.register(TblSponsorDetails)
+admin.site.register(TblCourses)

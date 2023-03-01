@@ -39,7 +39,7 @@ class ApplicantTypeViewSet(APIView):
             return Response(response_obj)
         response_obj = {
             "success": True,
-            "message": "No data specied in the body"}
+            "message": "No data specified in the body"}
         return Response(response_obj)
 
 
@@ -414,7 +414,7 @@ class ApplicantExistenceView(APIView):
 
                 _none_necta_applicant = TBL_App_Applicant.objects.filter(
                     applicant_details__applicant_type__none_necta__original_no=_index_no,
-                    appYear = _app_year
+                    appYear=_app_year
                 )
 
                 if _none_necta_applicant.exists():
@@ -481,7 +481,7 @@ class PreAplicantNectAContactInfosView(APIView):
                 # update the applicant details
                 _necta_applicant_details = TBL_App_ApplicantDetails.objects.get(
                     applicant_type__necta__index_no=_necta_applicant_type.necta.index_no,
-                    appYear = _app_year
+                    appYear=_app_year
 
                 )
                 _necta_applicant_details.phonenumber = _phone_number
@@ -565,7 +565,7 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                 try:
                     _none_necta_applicant = TBL_App_NoneNECTADetails.objects.get(
                         original_no=_index_no,
-                        app_year = _app_year
+                        app_year=_app_year
                     )
 
                     TBL_App_NoneNECTADetails.objects.filter(id=_none_necta_applicant.id).update(
@@ -604,15 +604,15 @@ class PreAplicantNoneNectAContactInfosView(APIView):
                 # get or create the applicnt table if not  exits
                 applicant, created = TBL_App_Applicant.objects.get_or_create(
                     applicant_details=_none_necta_applicant_details,
-                    application_category=application_category, 
-                    appYear = _app_year
+                    application_category=application_category,
+                    appYear=_app_year
 
                 )
 
                 _applicant_infos = TBL_App_Applicant.objects.filter(
                     applicant_details=_none_necta_applicant_details,
                     application_category=application_category,
-                    appYear = _app_year
+                    appYear=_app_year
 
                 )
 
@@ -1054,7 +1054,7 @@ class ApplicationRegistration(APIView):
                 )
                 _applicant = TBL_App_Applicant.objects.filter(
                     applicant_details__applicant_type__none_necta__original_no=_index_no,
-                    appYear = Constants.current_year
+                    appYear=Constants.current_year
                 ).first()
 
                 TblAppProfile.objects.filter(

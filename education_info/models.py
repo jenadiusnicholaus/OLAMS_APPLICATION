@@ -5,27 +5,40 @@ from loans_application.models import *
 from applicantProfile.models import *
 
 
+class TblPost4EductionType(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=10, null=True, blank=True)
+    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "1: TBL post 4 type"
+        ordering = ['-created_at']
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_post_4_education_type'
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class TBL_EducationInfo(models.Model):
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(
         TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_tbl_app_applicant")
     f4_no_of_seat = models.IntegerField(default=0)
-    pst4ed = models.CharField(max_length=30, null=True)
-    f4sps = models.CharField(max_length=30, null=True)
-    f4sps_cp = models.CharField(max_length=30, null=True)
-    f4sps_cp_phone = models.CharField(max_length=30, null=True)
-    f4sps_cp_addr = models.CharField(max_length=30, null=True)
-    pst4sps = models.CharField(max_length=30, null=True)
-    pst4sps_cp = models.CharField(max_length=30, null=True)
-    pst4sps_cp_phone = models.CharField(max_length=30, null=True)
-    pst4sps_cp_addr = models.CharField(max_length=30, null=True)
-    ay = models.CharField(max_length=30, null=True)
+    pst4ed = models.ForeignKey(TblPost4EductionType, on_delete=models.CASCADE,
+                               null=True, related_name="ed_post_4_eduction_type_set")
+    f4sps = models.BooleanField(default=False)
+
+    pst4sps = models.BooleanField(default=False)
+
+    app_year = models.CharField(max_length=30, null=True)
     confirm = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        verbose_name = "1: TBL Education"
+        verbose_name = "2: TBL Education"
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
         db_table = 'tbl_application_education_info'
@@ -33,6 +46,37 @@ class TBL_EducationInfo(models.Model):
     def __str__(self):
 
         return str(self. id)
+
+
+class TblSponsorDetails(models.Model):
+    id = models.AutoField(primary_key=True)
+    SPOSORED_CHOISES = (
+        (0, "POST fORM fOUR SPONSORSHIP"),
+        (1, "fORM fOUR SPONSORSHIP"),
+    )
+
+    sponsored_ed_type = models.CharField(
+        choices=SPOSORED_CHOISES, max_length=20, null=True)
+    applicant = models.ForeignKey(
+        TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_tbl_sps_set")
+    sponsor_contact_person_full_name = models.CharField(
+        max_length=30, null=True)
+    sponsor_contact_person_phone_nunber = models.CharField(
+        max_length=30, null=True)
+    sponsor_contact_person_address = models.CharField(max_length=40, null=True)
+    app_year = models.CharField(max_length=4, null=True)
+    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "3: TBL Sponsor"
+        ordering = ['-created_at']
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_sponsor_education_info'
+
+    def __str__(self):
+
+        return str(self.id)
 
 
 class TBL_Education_ApplicantAttendedSchool(models.Model):
@@ -45,7 +89,7 @@ class TBL_Education_ApplicantAttendedSchool(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        verbose_name = '2: TBL Education Applicant Attended Schools'
+        verbose_name = '4: TBL Education Applicant Attended Schools'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
         db_table = 'tbl_application_secondary_schools'
@@ -67,7 +111,7 @@ class TBL_Education_FormFourInfos(models.Model):
     # add some more field here
 
     class Meta:
-        verbose_name = '3: TBL Eduction Form four infos '
+        verbose_name = '5: TBL Eduction Form four infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
         db_table = 'tbl_application_form_four_details'
@@ -76,7 +120,7 @@ class TBL_Education_FormFourInfos(models.Model):
         return self.index_no
 
 
-class TBL_Education_FormSixInfos(models.Model):
+class TBLEducationFormSixInfos(models.Model):
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE,
                                   null=True, related_name="ed_form6_info_tbl_app_applicant")
@@ -87,13 +131,13 @@ class TBL_Education_FormSixInfos(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        verbose_name = '4:TBL Eduction Form Six infos '
+        verbose_name = '6:TBL Eduction Form Six infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
-        db_table = 'tbl_application_form_six_details'
+        db_table = 'tbl_form_six_details'
 
     def __str__(self):
-        return self.index_no
+        return self.f6index_no
 
 
 class TblDiplomaInstitutions(models.Model):
@@ -143,8 +187,8 @@ class TblDiplomaDetails(models.Model):
     avn = models.CharField(max_length=60, null=True)
     entryYear = models.CharField(max_length=10, null=True)
     graduateYear = models.CharField(max_length=10, null=True)
-    gpa = models.DecimalField(max_digits=1, null=True,
-                              decimal_places=1, default=0.0)
+    gpa = models.FloatField(null=True,
+                            default=0.0)
     registrationNumber = models.CharField(max_length=60, null=True)
     diplomaInstitution = models.ForeignKey(TblDiplomaInstitutions, on_delete=models.DO_NOTHING, null=True,
                                            related_name="ed_diploma_institution")
@@ -154,7 +198,7 @@ class TblDiplomaDetails(models.Model):
     # add some more field here
 
     class Meta:
-        verbose_name = '5:TBL Eduction Diploma infos '
+        verbose_name = '9:TBL Eduction Diploma infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
         db_table = 'tbl_application_diploma_details'
@@ -199,7 +243,7 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        verbose_name = '6:TBL Tertiary Education infos'
+        verbose_name = '10:TBL Tertiary Education infos'
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
         db_table = 'tbl_tertiary_education'
@@ -244,6 +288,6 @@ class TblTertiaryEducationMasterAward(models.Model):
                                     on_delete=models.DO_NOTHING)
 
     class Meta:
-        verbose_name = "10. Master Awards"
+        verbose_name = "11. Master Awards"
         verbose_name_plural = verbose_name
         db_table = 'tbl_tertiary_education_master_awards'
