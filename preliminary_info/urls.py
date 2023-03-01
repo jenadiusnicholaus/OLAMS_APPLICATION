@@ -2,8 +2,8 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import *
 router = routers.DefaultRouter()
-router.register(r'preliminary-info3', PreliminaryInfoView,basename='preliminary-info3')
-
+router.register(r'preliminary-info-save', PreliminaryInfoView,basename='preliminary-info-save')
+router.register(r'preliminary-parent-info', ParentInfoView,basename='preliminary-parent-info')
 
 urlpatterns = [
     path('preliminary-info/', include(router.urls)),
