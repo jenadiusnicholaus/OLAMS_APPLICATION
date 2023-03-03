@@ -7,6 +7,9 @@ from rest_framework.views import APIView
 from rest_framework import routers, serializers, viewsets
 from applicantProfile.models import TblAppProfile
 from loans_application.necta_serializers import UserProfileSerialiozer
+from api_service. external_api import CallExternalApi
+import json
+from parse_jsons.necta_individual_particular_model import NectaResponse, Particulars, Status
 
 
 class CheckSchoolExistence(APIView):
@@ -76,7 +79,8 @@ class ApplicantSponsorshipViewSet(viewsets.ModelViewSet):
 
         }
         _spobj = TblSponsorDetails.objects.filter(
-            app_year=_app_year, applicant__id=_user_profile_id)
+
+            app_year=_app_year, sponsored_ed_type=_sps_ed_type,  applicant__id=_user_profile_id)
         if _spobj.exists():
             sponsorsInformation = _spobj.first()
             serializer = SponsorsSerializers(instance=sponsorsInformation)
@@ -154,6 +158,19 @@ class ApplicantEducationInformationView(APIView):
         _f4sps = request.data['form_four_sponsorship']
         _pst4sps = request.data['post_form_four_sponsorship']
         _app_year = request.data['app_year']
+
+        _newf4sps = None
+        _newPf4sps = None
+        if _f4sps == "true":
+            _newf4sps = 1 or True
+        else:
+            _newf4sps = 0 or False
+
+        if _pst4sps == "true":
+            _newPf4sps = 1 or True
+        else:
+            _newPf4sps = 0 or False
+
         _confirm = False
         applicantprofile = TblAppProfile.objects.get(id=_profileId)
         educationInfo = TBL_EducationInfo.objects.filter(
@@ -161,6 +178,7 @@ class ApplicantEducationInformationView(APIView):
         _post_form_four_type = TblPost4EductionType.objects.get(
             id=_pst4ed,
         )
+
         if educationInfo.exists():
             response_obj = {
                 "success": False,
@@ -173,8 +191,8 @@ class ApplicantEducationInformationView(APIView):
                 applicant=applicantprofile,
                 f4_no_of_seat=_f4_no_of_seat,
                 pst4ed=_post_form_four_type,
-                f4sps=_f4sps,
-                pst4sps=_pst4sps,
+                f4sps=_newf4sps,
+                pst4sps=_newPf4sps,
                 app_year=_app_year,
                 confirm=_confirm,
             )
@@ -404,20 +422,45 @@ class FormSixDetailsView(APIView):  # FORM SIX DETAILS #####################
             response_obj = {
                 "success": False,
                 "status_code": status.HTTP_200_OK,
-                "message": "exists"
+                "message": "Form six information already exits for this year."
             }
             return Response(response_obj)
         else:
-            created = TBLEducationFormSixInfos.objects.create(
-                applicant=self.get_user_profile(),
-                app_year=_app_year,
-                f6index_no=_f6index_no,
-            )
-            if created:
+
+            _index_components = _f6index_no.split("-")
+            _prefix_index_number = f"{_index_components[0]}-{_index_components[1]}"
+            _sufix_index_number = _index_components[2]
+
+            _response = CallExternalApi.get_individual_necta_particulars(
+                index_no=_prefix_index_number, exam_year=_sufix_index_number)
+
+            _response = CallExternalApi.get_individual_necta_particulars(
+                index_no=_prefix_index_number, exam_year=_sufix_index_number)
+
+            _particulars = Particulars(**_response['particulars'])
+
+            _status = Status(**_response['status'])
+            _student = NectaResponse(_particulars, status)
+
+            if _student.status.code == 200 and _student.particulars.center_number:
+                created = TBLEducationFormSixInfos.objects.create(
+                    applicant=self.get_user_profile(),
+                    app_year=_app_year,
+                    f6index_no=_f6index_no,
+                )
+                if created:
+
+                    response_obj = {
+                        "success": True,
+                        "status_code": status.HTTP_200_OK,
+                        "message": "Form six details saved Successfully"
+                    }
+                    return Response(response_obj)
+            else:
                 response_obj = {
                     "success": True,
                     "status_code": status.HTTP_200_OK,
-                    "message": "Form six details saved Successfully"
+                    "message": "Form six index no is no valid please double check it. and try again"
                 }
                 return Response(response_obj)
 
@@ -669,6 +712,11 @@ class TertiaryEducationView(APIView):
             }
             return Response(response_obj)
 
+    def get_object(self):
+        obj = TBL_Education_TertiaryEducationInfos.objects.filter(applicant=self.request.data['profileId'],
+                                                                  applicationYear=self.request.data['applicationYear']).first()
+        return obj
+
     def put(self, request, *args, **kwargs):
         _applicationYear = request.data['applicationYear']
         _applicant = request.data['profileId']
@@ -677,8 +725,7 @@ class TertiaryEducationView(APIView):
         _admittedDegreeCategory = request.data['admittedDegree']
         institutionadmitted = Institutions.objects.get(id=_admittedInstitute)
         courseadmitted = TblCourses.objects.get(id=_admittedCourse)
-        informationForEdit = TBL_Education_TertiaryEducationInfos.objects.filter(applicant=_applicant,
-                                                                                 applicationYear=_applicationYear).first()
+        informationForEdit = self.get_object()
         if informationForEdit is not None:
             dataToEdit = {
                 'admittedInstitute': institutionadmitted,
