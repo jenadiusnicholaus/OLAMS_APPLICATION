@@ -1,3 +1,4 @@
+import requests
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -46,7 +47,9 @@ class PreliminaryInfoView(viewsets.ModelViewSet):
 
     def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
-        instance = self.get_object()
+        applicant = request.data.get('profileId')
+        app_year = request.data.get('app_year')
+        instance = TblParentsInfo.objects.get(applicant=applicant, appYear=app_year)
         # Map user input fields to object fields
         data = {
             'applicant': request.data.get('profileId', instance.applicant),
@@ -64,8 +67,21 @@ class PreliminaryInfoView(viewsets.ModelViewSet):
         }
         serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+        if serializer.is_valid:
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Preliminary information Saved Successfully",
+            }
+            return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                "status_code": status.HTTP_204_NO_CONTENT,
+                "message": "Preliminary information not available",
+            }
+            return Response(response_obj)
     
 
 class ParentInfoView(viewsets.ModelViewSet):
@@ -111,7 +127,6 @@ class ParentInfoView(viewsets.ModelViewSet):
         applicant = request.data.get('profileId')
         app_year = request.data.get('app_year')
         instance = TblParentsInfo.objects.get(applicant=applicant, appYear=app_year)
-        print(request.method)
         # Map user input fields to object fields
         data = {
             'applicant': request.data.get('profileId'),
@@ -140,5 +155,264 @@ class ParentInfoView(viewsets.ModelViewSet):
                 "success":False,
                 "status_code": status.HTTP_204_NO_CONTENT,
                 "message": "Parent information not available",
+            }
+            return Response(response_obj)
+class ParentDeathInfoView(viewsets.ModelViewSet):
+    authentication_classes = []
+    permission_classes = []
+    queryset = TblParentsInfo.objects.all()
+    serializer_class = DeathInformationSerializer
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    def create(self, request, *args, **kwargs):
+        # Map user input fields to object fields
+        # applicantprofile = TblAppProfile.objects.get(id=request.data['profileId'])
+        data = {
+            'applicant': request.data.get('profileId'),
+            'deathCertificateNo': request.data.get('deathCertificateNo'),
+            'deceasedName': request.data.get('deceasedName'),
+            'applicantRelationship':request.data.get('applicantRelationship'),
+            'appYear': request.data.get('app_year'),
+        }
+        serializer = DeathInformationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Death Information Saved Successfully",
+            }
+            return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                "message": serializer.errors,
+            }
+            return Response(response_obj)
+
+    def update(self, request, *args, **kwargs):
+        applicant = request.data.get('profileId')
+        app_year = request.data.get('app_year')
+        instance = TblParentDeathInfo.objects.get(applicant=applicant, appYear=app_year)
+        # Map user input fields to object fields
+        data = {
+            'applicant': request.data.get('profileId'),
+            'deathCertificateNo': request.data.get('deathCertificateNo'),
+            'deceasedName': request.data.get('deceasedName'),
+            'applicantRelationship': request.data.get('applicantRelationship'),
+        }
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid:
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Parent Death information updated",
+            }
+            return Response(response_obj)
+        else:
+            response_obj ={
+                "success":False,
+                "status_code": status.HTTP_204_NO_CONTENT,
+                "message": "Parent Death information not available",
+            }
+            return Response(response_obj)
+class DisabilityView(viewsets.ModelViewSet):
+    authentication_classes = []
+    permission_classes = []
+    queryset = TblDisability.objects.all()
+    serializer_class = DisabilitySerializer
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    def create(self, request, *args, **kwargs):
+        # Map user input fields to object fields
+        # applicantprofile = TblAppProfile.objects.get(id=request.data['profileId'])
+        data = {
+            'name' : request.data.get('disabilityName'),
+            'description': request.data.get('description')
+        }
+        serializer = DisabilitySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Disability Type Saved Successfully",
+            }
+            return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                "message": serializer.errors,
+            }
+            return Response(response_obj)
+
+    def update(self, request, *args, **kwargs):
+        DisabilityName = request.data.get('disabilityName')
+        instance = TblDisability.objects.get(name=DisabilityName)
+        # Map user input fields to object fields
+        data = {
+            'name': request.data.get('disabilityName'),
+            'description': request.data.get('description')
+        }
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid:
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Disability Name updated",
+            }
+            return Response(response_obj)
+        else:
+            response_obj ={
+                "success":False,
+                "status_code": status.HTTP_204_NO_CONTENT,
+                "message": "Disability Name not Found",
+            }
+            return Response(response_obj)
+class ParentAndApplicantDisabilityInfoView(viewsets.ModelViewSet):
+    authentication_classes = []
+    permission_classes = []
+    queryset = TblDisabilityInfo.objects.all()
+    serializer_class = DisabilityInforSerializer
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    def create(self, request, *args, **kwargs):
+        # Map user input fields to object fields
+        # applicantprofile = TblAppProfile.objects.get(id=request.data['profileId'])
+        data = {
+            'applicant': request.data.get('profileId'),
+            'disabilityType': request.data.get('disabilityType'),
+            'disabledPerson': request.data.get('disabilityType'),
+            'appYear': request.data.get('app_year'),
+        }
+        serializer = DisabilityInforSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Disability Information Saved Successfully",
+            }
+            return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                "message": serializer.errors,
+            }
+            return Response(response_obj)
+
+    def update(self, request, *args, **kwargs):
+        applicant = request.data.get('profileId')
+        app_year = request.data.get('app_year')
+        instance = TblDisabilityInfo.objects.get(applicant=applicant, appYear=app_year)
+        # Map user input fields to object fields
+        data = {
+            'applicant': request.data.get('profileId'),
+            'disabilityType': request.data.get('disabilityType'),
+            'disabledPerson': request.data.get('disabilityType'),
+        }
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid:
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "Disability information updated",
+            }
+            return Response(response_obj)
+        else:
+            response_obj ={
+                "success":False,
+                "status_code": status.HTTP_204_NO_CONTENT,
+                "message": "Disability information not available",
+            }
+            return Response(response_obj)
+
+class TasafInfoView(viewsets.ModelViewSet):
+    authentication_classes = []
+    permission_classes = []
+    queryset = TblTasafInfo.objects.all()
+    serializer_class = TasafInforSerializer
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
+    def create(self, request, *args, **kwargs):
+        api_response = requests.get('http://api.example.com/data')
+
+        # Check if the response is successful and non-empty
+        if api_response.status_code == 200 and api_response.json():
+            # Parse the API response and create a new TblTasafInfo instance
+            api_data = api_response.json()
+            tasaf_info = TblTasafInfo(
+                applicant = request.data.get('profileId'),
+                appYear = request.data.get('app_year'),
+                firstName=api_data['first_name'],
+                middleName=api_data['middle_name'],
+                lastName=api_data['last_name'],
+                dateOfBirth=api_data['date_of_birth'],
+                registrationNo=api_data['registration_no'],
+                memberLineNo=api_data['member_line_no'],
+                gender=api_data['gender']
+            )
+            serializer = TasafInforSerializer(data=tasaf_info)
+            if serializer.is_valid():
+                serializer.save()
+                response_obj = {
+                    "success": True,
+                    'status_code': status.HTTP_200_OK,
+                    "message": "TASAF Information Saved Successfully",
+                    "data": api_data
+                }
+                return Response(response_obj)
+            else:
+                response_obj = {
+                    "success": False,
+                    'status_code': status.HTTP_400_BAD_REQUEST,
+                    "message": serializer.errors,
+                    "data":0
+                }
+                return Response(response_obj)
+        else:
+            response_obj = {
+                "success": False,
+                'status_code': status.HTTP_400_BAD_REQUEST,
+                "message": api_response.status_code,
+                "data": 0
+            }
+            return Response(response_obj)
+
+    def update(self, request, *args, **kwargs):
+        applicant = request.data.get('profileId')
+        app_year = request.data.get('app_year')
+        instance = TblTasafInfo.objects.get(applicant=applicant, appYear=app_year)
+        # Map user input fields to object fields
+        data = {
+            'applicant': request.data.get('profileId'),
+            'firstName' : request.data.get('firstName'),
+            'middleName' : request.data.get('middleName'),
+            'lastName' : request.data.get('lastName'),
+            'dateOfBirth' : request.data.get('dateOfBirth'),
+            'registrationNo' : request.data.get('registrationNo'),
+            'memberLineNo' : request.data.get('memberLineNo'),
+            'gender' : request.data.get('gender'),
+        }
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.is_valid:
+            serializer.save()
+            response_obj = {
+                "success": True,
+                'status_code': status.HTTP_200_OK,
+                "message": "TASAF information updated",
+            }
+            return Response(response_obj)
+        else:
+            response_obj ={
+                "success":False,
+                "status_code": status.HTTP_204_NO_CONTENT,
+                "message": "Disability information not available",
             }
             return Response(response_obj)
