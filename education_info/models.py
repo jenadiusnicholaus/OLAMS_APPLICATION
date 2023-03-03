@@ -228,6 +228,10 @@ class Institutions(models.Model):
 
 
 class TBL_Education_TertiaryEducationInfos(models.Model):
+    ADMITED_DEGREE_CATEGORY = (
+        (0, 'MASTER'),
+        (1, 'BACHELOR')
+    )
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE,
                                   null=True, related_name="ed_te_info_tbl_app_applicant")
@@ -236,7 +240,7 @@ class TBL_Education_TertiaryEducationInfos(models.Model):
     admittedCourse = models.ForeignKey(
         TblCourses, null=False, on_delete=models.DO_NOTHING)
     admittedDegreeCategory = models.CharField(
-        null=False, default="Master", max_length=15)
+        null=False, default=0, max_length=15, choices = ADMITED_DEGREE_CATEGORY)
     applicationYear = models.IntegerField(null=False, default="2023")
     confirm = models.BooleanField(default=False)
     updated_at = models.DateTimeField(default=timezone.now)
