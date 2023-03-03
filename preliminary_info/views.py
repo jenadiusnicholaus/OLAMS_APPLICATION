@@ -340,7 +340,9 @@ class TasafInfoView(viewsets.ModelViewSet):
     serializer_class = TasafInforSerializer
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     def create(self, request, *args, **kwargs):
-        api_response = requests.get('http://api.example.com/data')
+        houseHoldId = '07021920381897'
+        api_url = f'http://192.168.50.26:8070/api/v1/tasaf/getHouseHold?hhNo={houseHoldId}'
+        api_response = requests.get(api_url)
 
         # Check if the response is successful and non-empty
         if api_response.status_code == 200 and api_response.json():
