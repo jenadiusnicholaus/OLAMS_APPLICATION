@@ -164,31 +164,67 @@ class ParentDeathInfoView(viewsets.ModelViewSet):
     serializer_class = DeathInformationSerializer
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     def create(self, request, *args, **kwargs):
+        profileId = request.data.get('profileId')
+        applicationCode = request.data.get('applicationCode')
+        appYear = request.data.get('app_year')
+        type = request.data.get('ritaCertificateType')
+        # url = f'http://example.com/api?param1={param1}&param2={param2}'
+        params = {'f4ndexno':profileId, 'applicationCode': applicationCode,'appYear':appYear,'type':type}
+        api_url ='http: // 192.168.50.32/RITA/ritaApi.php'
+        api_response = requests.get(api_url, params = params)
+
+        # Check if the response is successful and non-empty
+        if api_response.status_code == 200 and api_response.json():
+            # Parse the API response and create a new TblTasafInfo instance
+            api_data = api_response.json()
+            death_info = TblParentDeathInfo(
+                applicant= request.data.get('profileId'),
+                deathCertificateNo= api_data['deathCertificateNo'],
+                deceasedName = api_data['deceasedName'],
+                applicantRelationship = request.data.get('ritaCertificateType'),
+                appYear= request.data.get('app_year'),
+            )
+            serializer = DeathInformationSerializer(data=death_info)
+            if serializer.is_valid():
+                serializer.save()
+                response_obj = {
+                    "success": True,
+                    'status_code': status.HTTP_200_OK,
+                    "message": "Death Information Saved Successfully",
+                }
+                return Response(response_obj)
+            else:
+                response_obj = {
+                    "success": False,
+                    'status_code': status.HTTP_400_BAD_REQUEST,
+                    "message": serializer.errors,
+                }
+                return Response(response_obj)
         # Map user input fields to object fields
         # applicantprofile = TblAppProfile.objects.get(id=request.data['profileId'])
-        data = {
-            'applicant': request.data.get('profileId'),
-            'deathCertificateNo': request.data.get('deathCertificateNo'),
-            'deceasedName': request.data.get('deceasedName'),
-            'applicantRelationship':request.data.get('applicantRelationship'),
-            'appYear': request.data.get('app_year'),
-        }
-        serializer = DeathInformationSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            response_obj = {
-                "success": True,
-                'status_code': status.HTTP_200_OK,
-                "message": "Death Information Saved Successfully",
-            }
-            return Response(response_obj)
-        else:
-            response_obj = {
-                "success": False,
-                'status_code': status.HTTP_400_BAD_REQUEST,
-                "message": serializer.errors,
-            }
-            return Response(response_obj)
+        # death_info = {
+        #     'applicant': request.data.get('profileId'),
+        #     'deathCertificateNo': request.data.get('deathCertificateNo'),
+        #     'deceasedName': request.data.get('deceasedName'),
+        #     'applicantRelationship':request.data.get('applicantRelationship'),
+        #     'appYear': request.data.get('app_year'),
+        # }
+        # serializer = DeathInformationSerializer(data=death_info)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     response_obj = {
+        #         "success": True,
+        #         'status_code': status.HTTP_200_OK,
+        #         "message": "Death Information Saved Successfully",
+        #     }
+        #     return Response(response_obj)
+        # else:
+        #     response_obj = {
+        #         "success": False,
+        #         'status_code': status.HTTP_400_BAD_REQUEST,
+        #         "message": serializer.errors,
+        #     }
+        #     return Response(response_obj)
 
     def update(self, request, *args, **kwargs):
         applicant = request.data.get('profileId')

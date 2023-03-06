@@ -19,5 +19,6 @@ urlpatterns = [
     path('api/demographics/', include('demographics.urls')),
     path('api/applicant-profile/', include('applicantProfile.urls')),
     path('api/preliminary/',include('preliminary_info.urls')),
+    path('api/guarantors/',include('guarantordetails.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
