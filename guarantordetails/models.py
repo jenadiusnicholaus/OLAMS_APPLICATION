@@ -19,6 +19,7 @@ class TBL_GuarantorDetailsLUG(models.Model):
         return None
 
     applicant = models.ForeignKey(TblAppProfile, on_delete= models.CASCADE, null = True, related_name="guarantor_tbl_app_applicant")
+    first_name = models.CharField(max_length=30, null=True)
     sur_name = models.CharField(max_length=30)
     middle_name = models.CharField(max_length=30, null = True)
     sex = models.CharField(max_length=10, null =True, choices=SEX)
@@ -58,14 +59,13 @@ class TBL_GuarantorDetailsPGD(models.Model):
     telephone = PhoneNumberField(null=True)
 
     contact_title = models.CharField(max_length=20, null=True)
-
     # need some explaination
-    inst = models.CharField(max_length=20, null=True)
+    inst = models.CharField(max_length=20, null=True) # Name of Institution that guarantee the applicant
     region = models.ForeignKey(TblRegions, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_region_pgd")
 
     district = models.ForeignKey(TblDistrict, on_delete=models.DO_NOTHING, null= True, related_name="guarantor_district_pgd")
      
-    contactperson = models.CharField(max_length=20, null= True)
+    contactperson = models.CharField(max_length=100, null= True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now) 
     
