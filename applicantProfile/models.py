@@ -3,10 +3,7 @@ from django.db import models
 from loans_application.models import *
 from django.utils import timezone
 
-# Create your models here.
-
 class TblAppProfile(models.Model):
-
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TBL_App_Applicant, on_delete=models.DO_NOTHING,
                                   related_name='tbl_app_applicant_profile_set', null=True)
@@ -22,6 +19,7 @@ class TblAppProfile(models.Model):
         db_table = 'tbl_applicant_profile'
 
     def __str__(self):
+
         if self.user:
             return self.user.username
         elif self.applicant.applicant_details.applicant_type.necta:
@@ -30,7 +28,6 @@ class TblAppProfile(models.Model):
             return self.applicant.applicant_details.applicant_type.none_necta.first_name
 
 
-# updated user profile when applicant is created
 @receiver(post_save, sender=TBL_App_Applicant)
 def create_or_update_applicant_inst_profile(sender, instance, created, **kwargs):
     if created:

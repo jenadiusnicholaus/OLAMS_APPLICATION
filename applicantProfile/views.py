@@ -32,7 +32,6 @@ class ApplicatProfileInfoView(APIView):
 
 
 class UploadApplicantPhotoView(viewsets.ModelViewSet):
-    # allowed_methods = ['GET', 'POST', 'PUT', 'PATCH', ]
 
     queryset = ApplicantPhoto.objects.all()
     serializer_class = UploadImageSerializer

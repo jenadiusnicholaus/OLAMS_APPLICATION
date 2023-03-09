@@ -5,3 +5,5 @@ from . models import *
 
 admin.site.register(TblDisability)
 admin.site.register(TblDisabilityInfo)
+admin.site.register(TblParentDeathInfo)
+admin.site.register(TblParentsInfo)

@@ -48,6 +48,14 @@ class CoursesSerializers(serializers.ModelSerializer):
 
 
 class EducationInfoSerializer(serializers.ModelSerializer):
+    pst4ed = PostF4TypeSerializers()
+
+    class Meta:
+        model = TBL_EducationInfo
+        fields = "__all__"
+
+
+class EditandPostEducationInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TBL_EducationInfo
@@ -55,12 +63,18 @@ class EducationInfoSerializer(serializers.ModelSerializer):
 
 
 class FormfourInformationSerializer(serializers.ModelSerializer):
+    second_seat_index_no = serializers.CharField(
+        required=False,  allow_blank=True)
+    third_seat_index_no = serializers.CharField(
+        required=False,  allow_blank=True)
+
     class Meta:
         model = TBL_Education_FormFourInfos
-        fields = "__all__"
+        fields = ["second_seat_index_no", "third_seat_index_no"]
 
 
 class FormsixInformationSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TBLEducationFormSixInfos
         fields = "__all__"
@@ -73,18 +87,39 @@ class DiplomaInformationSerializer(serializers.ModelSerializer):
 
 
 class TertiaryEducationSerializer(serializers.ModelSerializer):
+
+    admittedInstitute = InstitutionSerializers()
+    admittedCourse = CoursesSerializers()
+
+    class Meta:
+        model = TBL_Education_TertiaryEducationInfos
+        fields = "__all__"
+
+
+class EditPostTertiaryEducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TBL_Education_TertiaryEducationInfos
         fields = "__all__"
 
 
 class BachelorDegreeAwardSerializer(serializers.ModelSerializer):
+    institution = InstitutionSerializers()
+
     class Meta:
         model = TblTertiaryEducationBachelorAwards
         fields = "__all__"
 
 
+class EditOrPostBachelorDegreeAwardSerializer(serializers.ModelSerializer):
+      class Meta:
+        model = TblTertiaryEducationBachelorAwards
+        fields = "__all__"
+
+
+
 class MasterDegreeAwardSerializer(serializers.ModelSerializer):
+    institution = InstitutionSerializers()
+
     class Meta:
         model = TblTertiaryEducationMasterAward
         fields = "__all__"

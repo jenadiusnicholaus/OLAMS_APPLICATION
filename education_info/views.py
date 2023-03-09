@@ -10,6 +10,106 @@ from loans_application.necta_serializers import UserProfileSerialiozer
 from api_service. external_api import CallExternalApi
 import json
 from parse_jsons.necta_individual_particular_model import NectaResponse, Particulars, Status
+from drf_multiple_model.views import FlatMultipleModelAPIView
+from rest_framework.decorators import action
+
+
+class EductionAllDetails(APIView):
+    def get(self, request):
+        serializer_bi_data = None
+        serializer_di_data = None
+        serializer_f6i_data = None
+        serializer_f4i_data = None
+        serializer_ti_data = None
+        serializer_bchi_data = None
+        serializer_mi_data = None
+
+        _user_profile_id = request.query_params.get('user_profile_id', None)
+        user_profile = TblAppProfile.objects.get(id=_user_profile_id)
+        try:
+            _base_education_infos = TBL_EducationInfo.objects.get(
+                applicant=user_profile)
+            serializer_bi = EducationInfoSerializer(_base_education_infos)
+            serializer_bi_data = serializer_bi.data
+        except:
+            serializer_bi_data = None
+
+        try:
+            _queryset_di = TblDiplomaDetails.objects.get(
+                applicant=user_profile)
+            serializer_di = DiplomaInformationSerializer(_queryset_di)
+            serializer_di_data = serializer_di.data
+        except:
+            serializer_di_data = None
+
+        try:
+            _queryset_f6 = TBLEducationFormSixInfos.objects.get(
+                applicant=user_profile)
+            serializer_f6i = FormsixInformationSerializer(_queryset_f6)
+
+            serializer_f6i_data = serializer_f6i.data
+        except:
+            serializer_f6i_data = None
+
+        try:
+            _queryset_f4 = TBL_Education_FormFourInfos.objects.get(
+                applicant=user_profile)
+            serializer_f4i = FormfourInformationSerializer(_queryset_f4)
+            serializer_f4i_data = serializer_f4i.data
+
+        except:
+            serializer_f4i_data = None
+
+        try:
+            _queryset_ti = TBL_Education_TertiaryEducationInfos.objects.get(
+                applicant=user_profile)
+
+            serializer_ti = TertiaryEducationSerializer(_queryset_ti)
+            serializer_ti_data = serializer_ti.data
+        except:
+            serializer_ti_data = None
+
+        try:
+            _queryset_bachalor = TblTertiaryEducationBachelorAwards.objects.get(
+                applicant=user_profile
+            )
+            _serializers_bachelar = BachelorDegreeAwardSerializer(
+                _queryset_bachalor)
+            serializer_bchi_data = _serializers_bachelar.data
+        except:
+            serializer_bchi_data = None
+
+        try:
+            _queryset_master = TblTertiaryEducationMasterAward.objects.get(
+                applicant=user_profile
+            )
+            _serializers_bachelar = MasterDegreeAwardSerializer(
+                _queryset_master)
+            serializer_mi_data = _serializers_bachelar.data
+        except:
+            serializer_mi_data = None
+
+        _queryset_sps = TblSponsorDetails.objects.filter(
+            applicant=user_profile)
+        serializer_spsi = SponsorsSerializers(_queryset_sps, many=True)
+
+        data = {
+            "success": True,
+            'status_code': status.HTTP_200_OK,
+            "message": "Ok",
+            'data': {
+                'base_education_infos': serializer_bi_data,
+                'sponsor_infos': serializer_spsi.data,
+                'form_4_infos': serializer_f4i_data,
+                'form_6_infos': serializer_f6i_data,
+                'diploma_info ': serializer_di_data,
+                'tertiary_infos': serializer_ti_data,
+                'tertiary_bachelor_infos': serializer_bchi_data,
+                'tertiary_master_infos': serializer_mi_data,
+            }
+
+        }
+        return Response(data)
 
 
 class CheckSchoolExistence(APIView):
@@ -66,21 +166,21 @@ class ApplicantSponsorshipViewSet(viewsets.ModelViewSet):
         _user_profile_id = request.data["user_profile_id"]
         _app_year = request.data["app_year"]
         _sponsor_contact_person_full_name = request.data["sponsor_contact_person_full_name"]
-        _sponsor_contact_person_phone_nunber = request.data["sponsor_contact_person_phone_nunber"]
+        _sponsor_contact_person_phone_nunber = request.data["sponsor_contact_person_phone_number"]
         _sponsor_contact_person_address = request.data["sponsor_contact_person_address"]
 
         data = {
             "sponsored_ed_type": _sps_ed_type,
             "applicant": _user_profile_id,
             "sponsor_contact_person_full_name": _sponsor_contact_person_full_name,
-            "sponsor_contact_person_phone_nunber": _sponsor_contact_person_phone_nunber,
+            "sponsor_contact_person_phone_number": _sponsor_contact_person_phone_nunber,
             "sponsor_contact_person_address": _sponsor_contact_person_address,
             "app_year": _app_year
 
         }
         _spobj = TblSponsorDetails.objects.filter(
 
-            app_year=_app_year, sponsored_ed_type=_sps_ed_type,  applicant__id=_user_profile_id)
+            app_year=_app_year, sponsored_ed_type=_sps_ed_type, applicant__id=_user_profile_id)
         if _spobj.exists():
             sponsorsInformation = _spobj.first()
             serializer = SponsorsSerializers(instance=sponsorsInformation)
@@ -119,13 +219,13 @@ class ApplicantSponsorshipViewSet(viewsets.ModelViewSet):
         _sps_ed_type = request.data["sps_ed_type"]
         _user_profile_id = request.data["user_profile_id"]
         _sponsor_contact_person_full_name = request.data["sponsor_contact_person_full_name"]
-        _sponsor_contact_person_phone_nunber = request.data["sponsor_contact_person_phone_nunber"]
+        _sponsor_contact_person_phone_nunber = request.data["sponsor_contact_person_phone_number"]
         _sponsor_contact_person_address = request.data["sponsor_contact_person_address"]
 
         data = {
             "sponsored_ed_type": _sps_ed_type,
             "sponsor_contact_person_full_name": _sponsor_contact_person_full_name,
-            "sponsor_contact_person_phone_nunber": _sponsor_contact_person_phone_nunber,
+            "sponsor_contact_person_phone_number": _sponsor_contact_person_phone_nunber,
             "sponsor_contact_person_address": _sponsor_contact_person_address
 
         }
@@ -134,14 +234,14 @@ class ApplicantSponsorshipViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         self.perform_update(serializer)
-        headers = self.get_success_headers(serializer.data)
+        # headers = self.get_success_headers(serializer.data)
         response_obj = {
             "success": True,
             'status_code': status.HTTP_201_CREATED,
-            "message": "Education Information saved",
+            "message": "Education Information updated",
             "data": serializer.data,
         }
-        return Response(response_obj.  headers)
+        return Response(response_obj)
 
     def partial_update(self, request):
         pass
@@ -214,7 +314,6 @@ class ApplicantEducationInformationView(APIView):
     def get(self, request, *args, **kwargs):
         _profileId = request.GET.get('profileId')
         _ay = request.GET.get('applicationYear')
-        # applicantprofile = TBL_App_Profile.objects.get(id=_profileId)
         educationInformation = TBL_EducationInfo.objects.get(
             applicant__id=_profileId, app_year=_ay)
         educationInfoserializer = EducationInfoSerializer(
@@ -262,7 +361,7 @@ class ApplicantEducationInformationView(APIView):
                 'pst4sps': _pst4sps,
 
             }
-            educationInforSerializer = EducationInfoSerializer(
+            educationInforSerializer = EditandPostEducationInfoSerializer(
                 instance, data=dataToEdit, partial=True)
             if educationInforSerializer.is_valid():
                 educationInforSerializer.save()
@@ -274,6 +373,7 @@ class ApplicantEducationInformationView(APIView):
                 }
                 return Response(response_obj)
             else:
+                print(educationInforSerializer.errors)
                 response_obj = {
                     "success": False,
                     "status_code": status.HTTP_200_OK,
@@ -348,9 +448,9 @@ class FormFourDetailsView(APIView):  # Other form four seating's Details
     def get_object(self):
         _applicant = self.request.data['profileId']
         _app_year = self.request.data['applicationYear']
-        _form_four_info_id = self.request.data['form_four_info_id']
-        obj = TBL_Education_FormFourInfos.objects.filter(id=_form_four_info_id,
-                                                         applicant=_applicant, app_year=_app_year).first()
+        # _form_four_info_id = self.request.data['form_four_info_id']
+        obj = TBL_Education_FormFourInfos.objects.filter(
+            applicant=_applicant, app_year=_app_year).first()
         return obj
 
     def put(self, request, *args, **kwargs):
@@ -375,6 +475,7 @@ class FormFourDetailsView(APIView):  # Other form four seating's Details
                 }
                 return Response(response_obj)
             else:
+                print(form4detailserializer.errors)
                 response_obj = {
                     "success": False,
                     "status_code": status.HTTP_200_OK,
@@ -434,13 +535,10 @@ class FormSixDetailsView(APIView):  # FORM SIX DETAILS #####################
             _response = CallExternalApi.get_individual_necta_particulars(
                 index_no=_prefix_index_number, exam_year=_sufix_index_number)
 
-            _response = CallExternalApi.get_individual_necta_particulars(
-                index_no=_prefix_index_number, exam_year=_sufix_index_number)
-
             _particulars = Particulars(**_response['particulars'])
 
             _status = Status(**_response['status'])
-            _student = NectaResponse(_particulars, status)
+            _student = NectaResponse(_particulars, _status)
 
             if _student.status.code == 200 and _student.particulars.center_number:
                 created = TBLEducationFormSixInfos.objects.create(
@@ -732,7 +830,7 @@ class TertiaryEducationView(APIView):
                 'admittedCourse': courseadmitted,
                 'admittedDegreeCategory': _admittedDegreeCategory,
             }
-            tertiaryInforSerializer = TertiaryEducationSerializer(
+            tertiaryInforSerializer = EditPostTertiaryEducationSerializer(
                 informationForEdit, data=dataToEdit, partial=True)
             if tertiaryInforSerializer.is_valid():
                 tertiaryInforSerializer.save()
@@ -775,8 +873,8 @@ class TertiaryEducationBachelorAwardsView(APIView):
         applicantprofile = TblAppProfile.objects.get(id=_applicant)
         awardedinstitution = Institutions.objects.get(id=_institution)
         bachelorAward = TblTertiaryEducationBachelorAwards.objects.filter(applicant=_applicant,
-                                                                          applicationYear=_institution)
-        if bachelorAward.exist():
+                                                                          app_year=_app_year)
+        if bachelorAward.exists():
             response_obj = {
                 "success": False,
                 "status_code": status.HTTP_200_OK,
@@ -799,14 +897,20 @@ class TertiaryEducationBachelorAwardsView(APIView):
                     "success": True,
                     "status_code": status.HTTP_200_OK,
                     "message": "Tertiary details saved Successfully"
+
                 }
                 return Response(response_obj)
 
+    def get_object(self):
+        _app_year = self.request.data['applicationYear']
+        _applicant = self.request.data['profileId']
+
+        obj = TblTertiaryEducationBachelorAwards.objects.get(app_year=_app_year,
+                                                             applicant=_applicant)
+        return obj
+
     def get(self, request, *args, **kwargs):
-        _app_year = request.data['applicationYear']
-        _applicant = request.data['profileId']
-        bachelorAwards = TblTertiaryEducationBachelorAwards.objects.get(applicationYear=_app_year,
-                                                                        applicant=_applicant)
+        bachelorAwards = self.get_object()
         bachelorawardserializer = BachelorDegreeAwardSerializer(
             instance=bachelorAwards)
         if bachelorawardserializer is not None:
@@ -825,6 +929,7 @@ class TertiaryEducationBachelorAwardsView(APIView):
             return Response(response_obj)
 
     def put(self, request, *args, **kwargs):
+        # _id = request.data['bachelor_infos_id']
         _applicant = request.data['profileId']
         _award = request.data['award']
         _regno = request.data['regno']
@@ -833,20 +938,21 @@ class TertiaryEducationBachelorAwardsView(APIView):
         _gpa = request.data['gpa']
         _app_year = request.data['applicationYear']
         _institution = request.data['institutionGraduated']
-        awardedinstitution = Institutions.objects.get(id=_institution)
         informationForEdit = TblTertiaryEducationBachelorAwards.objects.filter(applicant=_applicant,
-                                                                               app_year=_app_year).first()
-        if informationForEdit is not None:
+                                                                               app_year=_app_year, )
+        if informationForEdit.exists():
+            information_to_edit = informationForEdit.first()
+
             dataToEdit = {
                 "award": _award,
                 "regno": _regno,
                 "entryYear": _entryYear,
                 "graduateYear": _graduateYear,
                 "gpa": _gpa,
-                "institution": awardedinstitution
+                "institution": _institution
             }
-            bachelorawardserializer = BachelorDegreeAwardSerializer(
-                informationForEdit, data=dataToEdit, partial=True)
+            bachelorawardserializer = EditOrPostBachelorDegreeAwardSerializer(
+                information_to_edit, data=dataToEdit, partial=True)
             if bachelorawardserializer.is_valid():
                 bachelorawardserializer.save()
                 response_obj = {
@@ -856,13 +962,17 @@ class TertiaryEducationBachelorAwardsView(APIView):
                 }
                 return Response(response_obj)
             else:
+                print(bachelorawardserializer.errors)
+
                 response_obj = {
                     "success": False,
                     "status_code": status.HTTP_200_OK,
-                    "message": "Bachelor degree info Failed to Updated"
+                    "message": "Bachelor degree info Failed to Updated",
+                    'error': bachelorawardserializer.errors
                 }
                 return Response(response_obj)
         else:
+
             response_obj = {
                 "success": False,
                 "status_code": status.HTTP_204_NO_CONTENT,
@@ -888,8 +998,8 @@ class MasterDegreeAwardView(APIView):
         applicantprofile = TblAppProfile.objects.get(id=_applicant)
         awardedinstitution = Institutions.objects.get(id=_institution)
         masterAward = TblTertiaryEducationMasterAward.objects.filter(applicant=_applicant,
-                                                                     applicationYear=_institution)
-        if masterAward.exist():
+                                                                     app_year=_institution)
+        if masterAward.exists():
             response_obj = {
                 "success": False,
                 "status_code": status.HTTP_200_OK,
@@ -918,10 +1028,14 @@ class MasterDegreeAwardView(APIView):
     def get(self, request, *args, **kwargs):
         _app_year = request.data['applicationYear']
         _applicant = request.data['profileId']
-        masterAwards = TblTertiaryEducationMasterAward.objects.get(applicationYear=_app_year,
-                                                                   applicant=_applicant)
+        masterAwards = TblTertiaryEducationMasterAward.objects.get(
+            app_year=_app_year,
+            applicant=_applicant
+        )
+
         masterrawardserializer = MasterDegreeAwardSerializer(
             instance=masterAwards)
+
         if masterrawardserializer is not None:
             response_obj = {
                 "success": True,
@@ -938,6 +1052,7 @@ class MasterDegreeAwardView(APIView):
             return Response(response_obj)
 
     def put(self, request, *args, **kwargs):
+        # _master_info_id = request.data['master_infos_id']
         _applicant = request.data['profileId']
         _master_award = request.data['masterAward']
         _regNo = request.data['masterRegNo']
@@ -956,7 +1071,7 @@ class MasterDegreeAwardView(APIView):
                 "entryYear": _entryYear,
                 "graduateYear": _graduateYear,
                 "gpa": _gpa,
-                "institution": awardedinstitution
+                "institution": _institution
             }
             masterawardserializer = MasterDegreeAwardSerializer(
                 informationForEdit, data=dataToEdit, partial=True)
@@ -995,7 +1110,7 @@ class EducationConfirmation(APIView):
         _confirm = 0
         _confirmed = 1
         dataToConfirm = TBL_EducationInfo.objects.filter(
-            applicant=_applicant, ay=_ay, confirm=_confirm).first()
+            applicant=_applicant, app_year=_ay, confirm=_confirm).first()
         if dataToConfirm is not None:
             confirmSerializer = ConfirmEducationInfoSerializer(
                 dataToConfirm, data={'confirm': _confirmed}, partial=True)

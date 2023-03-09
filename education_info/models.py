@@ -3,6 +3,7 @@ from datetime import timezone
 from django.db import models
 from loans_application.models import *
 from applicantProfile.models import *
+from drf_multiple_model.views import ObjectMultipleModelAPIView
 
 
 class TblPost4EductionType(models.Model):
@@ -52,16 +53,16 @@ class TblSponsorDetails(models.Model):
     id = models.AutoField(primary_key=True)
     SPOSORED_CHOISES = (
         (0, "POST fORM fOUR SPONSORSHIP"),
-        (1, "fORM fOUR SPONSORSHIP"),
+        (1, "FORM fOUR SPONSORSHIP"),
     )
 
-    sponsored_ed_type = models.CharField(
-        choices=SPOSORED_CHOISES, max_length=20, null=True)
+    sponsored_ed_type = models.IntegerField(
+        choices=SPOSORED_CHOISES,  null=True)
     applicant = models.ForeignKey(
         TblAppProfile, on_delete=models.CASCADE, null=True, related_name="ed_tbl_sps_set")
     sponsor_contact_person_full_name = models.CharField(
         max_length=30, null=True)
-    sponsor_contact_person_phone_nunber = models.CharField(
+    sponsor_contact_person_phone_number = models.CharField(
         max_length=30, null=True)
     sponsor_contact_person_address = models.CharField(max_length=40, null=True)
     app_year = models.CharField(max_length=4, null=True)
@@ -126,7 +127,7 @@ class TBLEducationFormSixInfos(models.Model):
                                   null=True, related_name="ed_form6_info_tbl_app_applicant")
     app_year = models.CharField(max_length=4, null=True)
     # add some more field here
-    f6index_no = models.CharField(max_length=16)
+    f6index_no = models.CharField(max_length=16, null=True)
     updated_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -198,7 +199,7 @@ class TblDiplomaDetails(models.Model):
     # add some more field here
 
     class Meta:
-        verbose_name = '9:TBL Eduction Diploma infos '
+        verbose_name = '9.TBL Eduction Diploma infos '
         ordering = ['-created_at']
         verbose_name_plural = verbose_name
         db_table = 'tbl_application_diploma_details'
@@ -227,35 +228,6 @@ class Institutions(models.Model):
         managed = False
 
 
-class TBL_Education_TertiaryEducationInfos(models.Model):
-    ADMITED_DEGREE_CATEGORY = (
-        (0, 'MASTER'),
-        (1, 'BACHELOR')
-    )
-    id = models.AutoField(primary_key=True)
-    applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE,
-                                  null=True, related_name="ed_te_info_tbl_app_applicant")
-    admittedInstitute = models.ForeignKey(
-        Institutions, on_delete=models.DO_NOTHING, null=False, )
-    admittedCourse = models.ForeignKey(
-        TblCourses, null=False, on_delete=models.DO_NOTHING)
-    admittedDegreeCategory = models.CharField(
-        null=False, default=0, max_length=15, choices = ADMITED_DEGREE_CATEGORY)
-    applicationYear = models.IntegerField(null=False, default="2023")
-    confirm = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(default=timezone.now)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    class Meta:
-        verbose_name = '10:TBL Tertiary Education infos'
-        ordering = ['-created_at']
-        verbose_name_plural = verbose_name
-        db_table = 'tbl_tertiary_education'
-
-    def __str__(self):
-        return self.admittedInstitute
-
-
 class TblTertiaryEducationBachelorAwards(models.Model):
     id = models.AutoField(primary_key=True)
     applicant = models.ForeignKey(TblAppProfile, null=True, on_delete=models.DO_NOTHING,
@@ -276,6 +248,35 @@ class TblTertiaryEducationBachelorAwards(models.Model):
 
     def __str__(self):
         return self.award
+
+
+class TBL_Education_TertiaryEducationInfos(models.Model):
+    ADMITED_DEGREE_CATEGORY = (
+        ('master', 'MASTER'),
+        ('bachelor', 'BACHELOR')
+    )
+    id = models.AutoField(primary_key=True)
+    applicant = models.ForeignKey(TblAppProfile, on_delete=models.CASCADE,
+                                  null=True, related_name="ed_te_info_tbl_app_applicant")
+    admittedInstitute = models.ForeignKey(
+        Institutions, on_delete=models.DO_NOTHING, null=False, )
+    admittedCourse = models.ForeignKey(
+        TblCourses, null=False, on_delete=models.DO_NOTHING)
+    admittedDegreeCategory = models.CharField(
+        null=False, default=0, max_length=15, choices=ADMITED_DEGREE_CATEGORY)
+    applicationYear = models.IntegerField(null=False, default="2023")
+    confirm = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = '10. TBL Tertiary Education infos'
+        ordering = ['-created_at']
+        verbose_name_plural = verbose_name
+        db_table = 'tbl_tertiary_education'
+
+    def __str__(self):
+        return str(self.admittedInstitute)
 
 
 class TblTertiaryEducationMasterAward(models.Model):

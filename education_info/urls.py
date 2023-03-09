@@ -3,14 +3,17 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import *
 router = routers.DefaultRouter()
+
 router.register(r'post-form-four', PostFormFourTypeViewSet)
 router.register(r'applicant-sponsors', ApplicantSponsorshipViewSet)
 router.register(r'institutes', DiplomaInstitutesViewSet)
 router.register(r'tertiary_institute', TertiaryInstitutesViewSet)
 router.register(r'courses', CoursesViewSet)
 
+
 urlpatterns = [
     path('v1/', include(router.urls)),
+    path('eduction-all-details',  EductionAllDetails.as_view()),
     path('check-school-existance/', CheckSchoolExistence.as_view()),
     path('education-informations/', ApplicantEducationInformationView.as_view()),
     path('education-formfour-seatings/', FormFourDetailsView.as_view()),
